@@ -7,33 +7,98 @@ import './StudentDashboard.css';
 
 // Демонстраційні дані
 const demoStudents = [
-  { id: 1, name: "Анна Петренко" },
-  { id: 2, name: "Іван Коваленко" },
-  { id: 3, name: "Марія Шевченко" },
-  { id: 4, name: "Олег Сидоренко" },
-  { id: 5, name: "Юлія Мельник" }
+  { id: 1, name: "Векерик Анастасія" },
+  { id: 2, name: "Дидичин Катерина" },
+  { id: 3, name: "Жиляк Олександр" },
+  { id: 4, name: "Коцюр Артем" },
+  { id: 5, name: "Литвинський Максим" },
+  { id: 6, name: "Мацишин Яна" },
+  { id: 7, name: "Маціборко Тетяна" },
+  { id: 8, name: "Осадчий Максим" },
+  { id: 9, name: "Паращук Ангеліна" },
+  { id: 10, name: "Паращук Юлія" },
+  { id: 11, name: "Романюк Романа" },
+  { id: 12, name: "Соколишин Соломія" },
+  { id: 13, name: "Чобанюк Анастасія" },
+  { id: 14, name: "Чорнецька Анастасія" },
+  { id: 15, name: "Якубів Анастасія" }
 ];
 
 const demoResults = [
-  { studentId: 1, test: "Варіант 1", score: 85, maxScore: 100, date: "2025-03-01" },
-  { studentId: 1, test: "Варіант 2", score: 90, maxScore: 100, date: "2025-03-15" },
-  { studentId: 1, test: "Варіант 3", score: 88, maxScore: 100, date: "2025-04-01" },
+  // Векерик Анастасія
+  { studentId: 1, test: "Варіант 1", score: 92, maxScore: 100, date: "2025-03-01" },
+  { studentId: 1, test: "Варіант 2", score: 94, maxScore: 100, date: "2025-03-15" },
+  { studentId: 1, test: "Варіант 3", score: 96, maxScore: 100, date: "2025-04-01" },
   
-  { studentId: 2, test: "Варіант 1", score: 70, maxScore: 100, date: "2025-03-01" },
-  { studentId: 2, test: "Варіант 2", score: 80, maxScore: 100, date: "2025-03-15" },
-  { studentId: 2, test: "Варіант 3", score: 85, maxScore: 100, date: "2025-04-01" },
+  // Дидичин Катерина
+  { studentId: 2, test: "Варіант 1", score: 88, maxScore: 100, date: "2025-03-01" },
+  { studentId: 2, test: "Варіант 2", score: 91, maxScore: 100, date: "2025-03-15" },
+  { studentId: 2, test: "Варіант 3", score: 89, maxScore: 100, date: "2025-04-01" },
   
-  { studentId: 3, test: "Варіант 1", score: 95, maxScore: 100, date: "2025-03-01" },
-  { studentId: 3, test: "Варіант 2", score: 92, maxScore: 100, date: "2025-03-15" },
-  { studentId: 3, test: "Варіант 3", score: 96, maxScore: 100, date: "2025-04-01" },
+  // Жиляк Олександр
+  { studentId: 3, test: "Варіант 1", score: 75, maxScore: 100, date: "2025-03-01" },
+  { studentId: 3, test: "Варіант 2", score: 80, maxScore: 100, date: "2025-03-15" },
+  { studentId: 3, test: "Варіант 3", score: 83, maxScore: 100, date: "2025-04-01" },
   
-  { studentId: 4, test: "Варіант 1", score: 65, maxScore: 100, date: "2025-03-01" },
-  { studentId: 4, test: "Варіант 2", score: 75, maxScore: 100, date: "2025-03-15" },
-  { studentId: 4, test: "Варіант 3", score: 78, maxScore: 100, date: "2025-04-01" },
+  // Коцюр Артем
+  { studentId: 4, test: "Варіант 1", score: 79, maxScore: 100, date: "2025-03-01" },
+  { studentId: 4, test: "Варіант 2", score: 82, maxScore: 100, date: "2025-03-15" },
+  { studentId: 4, test: "Варіант 3", score: 85, maxScore: 100, date: "2025-04-01" },
   
-  { studentId: 5, test: "Варіант 1", score: 80, maxScore: 100, date: "2025-03-01" },
-  { studentId: 5, test: "Варіант 2", score: 85, maxScore: 100, date: "2025-03-15" },
-  { studentId: 5, test: "Варіант 3", score: 90, maxScore: 100, date: "2025-04-01" }
+  // Литвинський Максим
+  { studentId: 5, test: "Варіант 1", score: 90, maxScore: 100, date: "2025-03-01" },
+  { studentId: 5, test: "Варіант 2", score: 92, maxScore: 100, date: "2025-03-15" },
+  { studentId: 5, test: "Варіант 3", score: 91, maxScore: 100, date: "2025-04-01" },
+  
+  // Мацишин Яна
+  { studentId: 6, test: "Варіант 1", score: 95, maxScore: 100, date: "2025-03-01" },
+  { studentId: 6, test: "Варіант 2", score: 97, maxScore: 100, date: "2025-03-15" },
+  { studentId: 6, test: "Варіант 3", score: 96, maxScore: 100, date: "2025-04-01" },
+  
+  // Маціборко Тетяна
+  { studentId: 7, test: "Варіант 1", score: 85, maxScore: 100, date: "2025-03-01" },
+  { studentId: 7, test: "Варіант 2", score: 87, maxScore: 100, date: "2025-03-15" },
+  { studentId: 7, test: "Варіант 3", score: 86, maxScore: 100, date: "2025-04-01" },
+  
+  // Осадчий Максим
+  { studentId: 8, test: "Варіант 1", score: 84, maxScore: 100, date: "2025-03-01" },
+  { studentId: 8, test: "Варіант 2", score: 86, maxScore: 100, date: "2025-03-15" },
+  { studentId: 8, test: "Варіант 3", score: 88, maxScore: 100, date: "2025-04-01" },
+  
+  // Паращук Ангеліна
+  { studentId: 9, test: "Варіант 1", score: 92, maxScore: 100, date: "2025-03-01" },
+  { studentId: 9, test: "Варіант 2", score: 94, maxScore: 100, date: "2025-03-15" },
+  { studentId: 9, test: "Варіант 3", score: 93, maxScore: 100, date: "2025-04-01" },
+  
+  // Паращук Юлія
+  { studentId: 10, test: "Варіант 1", score: 88, maxScore: 100, date: "2025-03-01" },
+  { studentId: 10, test: "Варіант 2", score: 90, maxScore: 100, date: "2025-03-15" },
+  { studentId: 10, test: "Варіант 3", score: 91, maxScore: 100, date: "2025-04-01" },
+  
+  // Романюк Романа
+  { studentId: 11, test: "Варіант 1", score: 86, maxScore: 100, date: "2025-03-01" },
+  { studentId: 11, test: "Варіант 2", score: 89, maxScore: 100, date: "2025-03-15" },
+  { studentId: 11, test: "Варіант 3", score: 88, maxScore: 100, date: "2025-04-01" },
+  
+  // Соколишин Соломія
+  { studentId: 12, test: "Варіант 1", score: 94, maxScore: 100, date: "2025-03-01" },
+  { studentId: 12, test: "Варіант 2", score: 96, maxScore: 100, date: "2025-03-15" },
+  { studentId: 12, test: "Варіант 3", score: 95, maxScore: 100, date: "2025-04-01" },
+  
+  // Чобанюк Анастасія
+  { studentId: 13, test: "Варіант 1", score: 89, maxScore: 100, date: "2025-03-01" },
+  { studentId: 13, test: "Варіант 2", score: 91, maxScore: 100, date: "2025-03-15" },
+  { studentId: 13, test: "Варіант 3", score: 90, maxScore: 100, date: "2025-04-01" },
+  
+  // Чорнецька Анастасія
+  { studentId: 14, test: "Варіант 1", score: 91, maxScore: 100, date: "2025-03-01" },
+  { studentId: 14, test: "Варіант 2", score: 93, maxScore: 100, date: "2025-03-15" },
+  { studentId: 14, test: "Варіант 3", score: 92, maxScore: 100, date: "2025-04-01" },
+  
+  // Якубів Анастасія
+  { studentId: 15, test: "Варіант 1", score: 90, maxScore: 100, date: "2025-03-01" },
+  { studentId: 15, test: "Варіант 2", score: 92, maxScore: 100, date: "2025-03-15" },
+  { studentId: 15, test: "Варіант 3", score: 91, maxScore: 100, date: "2025-04-01" }
 ];
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
