@@ -1,57 +1,82 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, ReferenceLine,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import './StudentDashboard.css';
 
-// Дані учнів
-const demoStudents = [
-  { id: 1, name: "Векерик Анастасія" },
-  { id: 2, name: "Дидичин Катерина" },
-  { id: 3, name: "Жиляк Олександр" },
-  { id: 4, name: "Коцюр Артем" },
-  { id: 5, name: "Литвинський Максим" },
-  { id: 6, name: "Мацишин Яна" },
-  { id: 7, name: "Маціборко Тетяна" },
-  { id: 8, name: "Осадчий Максим" },
-  { id: 9, name: "Паращук Ангеліна" },
-  { id: 10, name: "Паращук Юлія" },
-  { id: 11, name: "Романюк Романа" },
-  { id: 12, name: "Соколишин Соломія" },
-  { id: 13, name: "Чобанюк Анастасія" },
-  { id: 14, name: "Чорнецька Анастасія" },
-  { id: 15, name: "Якубів Анастасія" }
-];
-
-// Категорії тестів
-const testCategories = [
-  { id: "own", name: "Власні варіанти" },
-  { id: "training", name: "Тренувальні тести" }
-];
-
-// Тести
-const tests = [
-  // Власні варіанти
-  { id: "own1", name: "Варіант 1", category: "own" },
-  { id: "own2", name: "Варіант 2", category: "own" },
-  { id: "own3", name: "Варіант 3", category: "own" },
-  { id: "own4", name: "Варіант 4", category: "own" },
-  { id: "own5", name: "Варіант 5", category: "own" },
+// Функція для отримання даних з локального сховища або використання демо-даних
+const getStoredData = () => {
+  const savedStudents = localStorage.getItem('students');
+  const savedTests = localStorage.getItem('tests');
+  const savedResults = localStorage.getItem('results');
   
-  // Тренувальні тести (приклад перших 10 з 40)
-  { id: "tr1", name: "Трен. тест 1", category: "training" },
-  { id: "tr2", name: "Трен. тест 2", category: "training" },
-  { id: "tr3", name: "Трен. тест 3", category: "training" },
-  { id: "tr4", name: "Трен. тест 4", category: "training" },
-  { id: "tr5", name: "Трен. тест 5", category: "training" },
-  { id: "tr6", name: "Трен. тест 6", category: "training" },
-  { id: "tr7", name: "Трен. тест 7", category: "training" },
-  { id: "tr8", name: "Трен. тест 8", category: "training" },
-  { id: "tr9", name: "Трен. тест 9", category: "training" },
-  { id: "tr10", name: "Трен. тест 10", category: "training" },
-  // ... можна додати решту тренувальних тестів
-];
+  const defaultStudents = [
+    { id: 1, name: "Векерик Анастасія" },
+    { id: 2, name: "Дидичин Катерина" },
+    { id: 3, name: "Жиляк Олександр" },
+    { id: 4, name: "Коцюр Артем" },
+    { id: 5, name: "Литвинський Максим" },
+    { id: 6, name: "Мацишин Яна" },
+    { id: 7, name: "Маціборко Тетяна" },
+    { id: 8, name: "Осадчий Максим" },
+    { id: 9, name: "Паращук Ангеліна" },
+    { id: 10, name: "Паращук Юлія" },
+    { id: 11, name: "Романюк Романа" },
+    { id: 12, name: "Соколишин Соломія" },
+    { id: 13, name: "Чобанюк Анастасія" },
+    { id: 14, name: "Чорнецька Анастасія" },
+    { id: 15, name: "Якубів Анастасія" }
+  ];
+  
+  const defaultCategories = [
+    { id: "own", name: "Власні варіанти" },
+    { id: "training", name: "Тренувальні тести" }
+  ];
+  
+  const defaultTests = [
+    // Власні варіанти
+    { id: "own1", name: "Варіант 1", category: "own" },
+    { id: "own2", name: "Варіант 2", category: "own" },
+    { id: "own3", name: "Варіант 3", category: "own" },
+    { id: "own4", name: "Варіант 4", category: "own" },
+    { id: "own5", name: "Варіант 5", category: "own" },
+    
+    // Тренувальні тести (приклад перших 10 з 40)
+    { id: "tr1", name: "Трен. тест 1", category: "training" },
+    { id: "tr2", name: "Трен. тест 2", category: "training" },
+    { id: "tr3", name: "Трен. тест 3", category: "training" },
+    { id: "tr4", name: "Трен. тест 4", category: "training" },
+    { id: "tr5", name: "Трен. тест 5", category: "training" },
+    { id: "tr6", name: "Трен. тест 6", category: "training" },
+    { id: "tr7", name: "Трен. тест 7", category: "training" },
+    { id: "tr8", name: "Трен. тест 8", category: "training" },
+    { id: "tr9", name: "Трен. тест 9", category: "training" },
+    { id: "tr10", name: "Трен. тест 10", category: "training" }
+  ];
+  
+  // Приклад демо-результатів
+  const defaultResults = [
+    // Векерик Анастасія
+    { studentId: 1, testId: "own1", score: 28, maxScore: 32, date: "2025-03-01" },
+    { studentId: 1, testId: "own2", score: 30, maxScore: 32, date: "2025-03-15" },
+    { studentId: 1, testId: "own3", score: 31, maxScore: 32, date: "2025-04-01" },
+    
+    // Дидичин Катерина
+    { studentId: 2, testId: "own1", score: 24, maxScore: 32, date: "2025-03-01" },
+    { studentId: 2, testId: "own2", score: 26, maxScore: 32, date: "2025-03-15" },
+    
+    // І т.д. для інших учнів і тестів...
+  ];
+  
+  return {
+    students: savedStudents ? JSON.parse(savedStudents) : defaultStudents,
+    categories: defaultCategories,
+    tests: savedTests ? JSON.parse(savedTests) : defaultTests,
+    results: savedResults ? JSON.parse(savedResults) : defaultResults
+  };
+};
 
 // Таблиця переведення тестових балів у шкалу 100-200
 const conversionTable = [
@@ -90,116 +115,16 @@ const conversionTable = [
   { testScore: 32, scaledScore: 200 }
 ];
 
-// Мінімальний прохідний бал (відповідно до таблиці конвертації)
+// Мінімальний прохідний бал
 const MIN_PASSING_TEST_SCORE = 5;
 const MIN_PASSING_SCALED_SCORE = 100;
-
-// Приклад результатів (для демонстрації)
-const demoResults = [
-  // Результати для "Власних варіантів"
-  // Векерик Анастасія
-  { studentId: 1, testId: "own1", score: 28, maxScore: 32, date: "2025-03-01" },
-  { studentId: 1, testId: "own2", score: 30, maxScore: 32, date: "2025-03-15" },
-  { studentId: 1, testId: "own3", score: 31, maxScore: 32, date: "2025-04-01" },
-  { studentId: 1, testId: "own4", score: 29, maxScore: 32, date: "2025-04-15" },
-  { studentId: 1, testId: "own5", score: 30, maxScore: 32, date: "2025-05-01" },
-  
-  // Результати для "Тренувальних тестів" (приклад перших 5)
-  { studentId: 1, testId: "tr1", score: 26, maxScore: 32, date: "2025-05-05" },
-  { studentId: 1, testId: "tr2", score: 27, maxScore: 32, date: "2025-05-10" },
-  { studentId: 1, testId: "tr3", score: 28, maxScore: 32, date: "2025-05-15" },
-  { studentId: 1, testId: "tr4", score: 29, maxScore: 32, date: "2025-05-20" },
-  { studentId: 1, testId: "tr5", score: 30, maxScore: 32, date: "2025-05-25" },
-  
-  // Дидичин Катерина (аналогічно для всіх власних варіантів і кількох тренувальних)
-  { studentId: 2, testId: "own1", score: 24, maxScore: 32, date: "2025-03-01" },
-  { studentId: 2, testId: "own2", score: 26, maxScore: 32, date: "2025-03-15" },
-  { studentId: 2, testId: "own3", score: 25, maxScore: 32, date: "2025-04-01" },
-  { studentId: 2, testId: "own4", score: 27, maxScore: 32, date: "2025-04-15" },
-  { studentId: 2, testId: "own5", score: 28, maxScore: 32, date: "2025-05-01" },
-  { studentId: 2, testId: "tr1", score: 22, maxScore: 32, date: "2025-05-05" },
-  { studentId: 2, testId: "tr2", score: 24, maxScore: 32, date: "2025-05-10" },
-  
-  // Жиляк Олександр
-  { studentId: 3, testId: "own1", score: 18, maxScore: 32, date: "2025-03-01" },
-  { studentId: 3, testId: "own2", score: 20, maxScore: 32, date: "2025-03-15" },
-  { studentId: 3, testId: "own3", score: 22, maxScore: 32, date: "2025-04-01" },
-  
-  // Коцюр Артем
-  { studentId: 4, testId: "own1", score: 19, maxScore: 32, date: "2025-03-01" },
-  { studentId: 4, testId: "own2", score: 21, maxScore: 32, date: "2025-03-15" },
-  { studentId: 4, testId: "own3", score: 23, maxScore: 32, date: "2025-04-01" },
-  
-  // Литвинський Максим
-  { studentId: 5, testId: "own1", score: 25, maxScore: 32, date: "2025-03-01" },
-  { studentId: 5, testId: "own2", score: 27, maxScore: 32, date: "2025-03-15" },
-  { studentId: 5, testId: "own3", score: 26, maxScore: 32, date: "2025-04-01" },
-  
-  // Мацишин Яна
-  { studentId: 6, testId: "own1", score: 30, maxScore: 32, date: "2025-03-01" },
-  { studentId: 6, testId: "own2", score: 31, maxScore: 32, date: "2025-03-15" },
-  { studentId: 6, testId: "own3", score: 32, maxScore: 32, date: "2025-04-01" },
-  
-  // Маціборко Тетяна
-  { studentId: 7, testId: "own1", score: 23, maxScore: 32, date: "2025-03-01" },
-  { studentId: 7, testId: "own2", score: 25, maxScore: 32, date: "2025-03-15" },
-  { studentId: 7, testId: "own3", score: 24, maxScore: 32, date: "2025-04-01" },
-  
-  // Осадчий Максим
-  { studentId: 8, testId: "own1", score: 22, maxScore: 32, date: "2025-03-01" },
-  { studentId: 8, testId: "own2", score: 24, maxScore: 32, date: "2025-03-15" },
-  { studentId: 8, testId: "own3", score: 26, maxScore: 32, date: "2025-04-01" },
-  
-  // Паращук Ангеліна
-  { studentId: 9, testId: "own1", score: 28, maxScore: 32, date: "2025-03-01" },
-  { studentId: 9, testId: "own2", score: 29, maxScore: 32, date: "2025-03-15" },
-  { studentId: 9, testId: "own3", score: 30, maxScore: 32, date: "2025-04-01" },
-  
-  // Паращук Юлія
-  { studentId: 10, testId: "own1", score: 26, maxScore: 32, date: "2025-03-01" },
-  { studentId: 10, testId: "own2", score: 27, maxScore: 32, date: "2025-03-15" },
-  { studentId: 10, testId: "own3", score: 28, maxScore: 32, date: "2025-04-01" },
-  
-  // Романюк Романа
-  { studentId: 11, testId: "own1", score: 24, maxScore: 32, date: "2025-03-01" },
-  { studentId: 11, testId: "own2", score: 26, maxScore: 32, date: "2025-03-15" },
-  { studentId: 11, testId: "own3", score: 25, maxScore: 32, date: "2025-04-01" },
-  
-  // Соколишин Соломія
-  { studentId: 12, testId: "own1", score: 29, maxScore: 32, date: "2025-03-01" },
-  { studentId: 12, testId: "own2", score: 31, maxScore: 32, date: "2025-03-15" },
-  { studentId: 12, testId: "own3", score: 30, maxScore: 32, date: "2025-04-01" },
-  
-  // Чобанюк Анастасія
-  { studentId: 13, testId: "own1", score: 25, maxScore: 32, date: "2025-03-01" },
-  { studentId: 13, testId: "own2", score: 27, maxScore: 32, date: "2025-03-15" },
-  { studentId: 13, testId: "own3", score: 26, maxScore: 32, date: "2025-04-01" },
-  
-  // Чорнецька Анастасія
-  { studentId: 14, testId: "own1", score: 27, maxScore: 32, date: "2025-03-01" },
-  { studentId: 14, testId: "own2", score: 29, maxScore: 32, date: "2025-03-15" },
-  { studentId: 14, testId: "own3", score: 28, maxScore: 32, date: "2025-04-01" },
-  
-  // Якубів Анастасія
-  { studentId: 15, testId: "own1", score: 26, maxScore: 32, date: "2025-03-01" },
-  { studentId: 15, testId: "own2", score: 28, maxScore: 32, date: "2025-03-15" },
-  { studentId: 15, testId: "own3", score: 27, maxScore: 32, date: "2025-04-01" }
-];
-
-// Додамо декілька низьких результатів для демонстрації "не склав"
-[...Array(5)].forEach((_, index) => {
-  demoResults.push({
-    studentId: 3 + index,
-    testId: "tr1",
-    score: 3,
-    maxScore: 32,
-    date: "2025-05-05"
-  });
-});
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 const StudentDashboard = () => {
+  // Отримуємо дані з локального сховища
+  const { students, categories, tests, results } = getStoredData();
+  
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [scoreType, setScoreType] = useState("raw"); // "raw" або "scaled"
@@ -221,8 +146,8 @@ const StudentDashboard = () => {
 
   useEffect(() => {
     // Встановлюємо першу категорію як вибрану за замовчуванням
-    if (testCategories.length > 0 && !selectedCategory) {
-      setSelectedCategory(testCategories[0].id);
+    if (categories.length > 0 && !selectedCategory) {
+      setSelectedCategory(categories[0].id);
     }
     
     // Фільтруємо тести за вибраною категорією
@@ -232,10 +157,10 @@ const StudentDashboard = () => {
     }
     
     // Встановлюємо першого студента як вибраного за замовчуванням
-    if (demoStudents.length > 0 && !selectedStudent) {
-      handleStudentSelect(demoStudents[0].id);
+    if (students.length > 0 && !selectedStudent) {
+      handleStudentSelect(students[0].id);
     }
-  }, [selectedCategory, selectedStudent]);
+  }, [selectedCategory, selectedStudent, categories, students, tests]);
   
   useEffect(() => {
     // Розрахунок розподілу балів за шкалою 100-200
@@ -249,7 +174,7 @@ const StudentDashboard = () => {
         { name: "Не склав", range: [0, 99], count: 0 }
       ];
       
-      demoResults.forEach(result => {
+      results.forEach(result => {
         const scaledScore = convertToScaledScore(result.score);
         const range = scoreRanges.find(sr => 
           scaledScore >= sr.range[0] && scaledScore <= sr.range[1]
@@ -271,7 +196,7 @@ const StudentDashboard = () => {
         { name: "Не склав", range: [0, 4], count: 0 }
       ];
       
-      demoResults.forEach(result => {
+      results.forEach(result => {
         const range = scoreRanges.find(sr => 
           result.score >= sr.range[0] && result.score <= sr.range[1]
         );
@@ -282,7 +207,7 @@ const StudentDashboard = () => {
       
       setOverallDistribution(scoreRanges);
     }
-  }, [scoreType]);
+  }, [scoreType, results]);
   
   useEffect(() => {
     if (!selectedCategory) return;
@@ -291,7 +216,7 @@ const StudentDashboard = () => {
     const testsInCategory = tests.filter(test => test.category === selectedCategory);
     
     const avgByTest = testsInCategory.map(test => {
-      const testResults = demoResults.filter(r => r.testId === test.id);
+      const testResults = results.filter(r => r.testId === test.id);
       if (testResults.length === 0) return { 
         test: test.name, 
         avgRawScore: 0,
@@ -317,14 +242,14 @@ const StudentDashboard = () => {
     });
     
     setAverageScores(avgByTest);
-  }, [selectedCategory]);
+  }, [selectedCategory, tests, results]);
   
   useEffect(() => {
     if (!selectedStudent || !selectedCategory) return;
     
     // Оновлюємо дані індивідуального прогресу при зміні студента або категорії
     updateIndividualProgress();
-  }, [selectedStudent, selectedCategory, scoreType]);
+  }, [selectedStudent, selectedCategory, scoreType, tests, results]);
   
   const handleStudentSelect = (studentId) => {
     setSelectedStudent(studentId);
@@ -346,7 +271,7 @@ const StudentDashboard = () => {
     const testsInCategory = tests.filter(test => test.category === selectedCategory);
     
     // Фільтруємо результати для вибраного студента і тестів вибраної категорії
-    const studentResults = demoResults
+    const studentResults = results
       .filter(r => r.studentId === studentId && 
                   testsInCategory.some(test => test.id === r.testId))
       .sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -369,12 +294,12 @@ const StudentDashboard = () => {
   };
   
   const getStudentName = (id) => {
-    const student = demoStudents.find(s => s.id === id);
+    const student = students.find(s => s.id === id);
     return student ? student.name : "";
   };
   
   const getStudentAverage = (id, categoryId = null, useScaledScore = false) => {
-    let relevantResults = demoResults.filter(r => r.studentId === id);
+    let relevantResults = results.filter(r => r.studentId === id);
     
     // Якщо вказана категорія, фільтруємо результати за нею
     if (categoryId) {
@@ -396,7 +321,7 @@ const StudentDashboard = () => {
   };
   
   const getStudentPassRate = (id, categoryId = null) => {
-    let relevantResults = demoResults.filter(r => r.studentId === id);
+    let relevantResults = results.filter(r => r.studentId === id);
     
     // Якщо вказана категорія, фільтруємо результати за нею
     if (categoryId) {
@@ -428,7 +353,12 @@ const StudentDashboard = () => {
 
   return (
     <div className="dashboard">
-      <h1 className="dashboard-title">Дашборд успішності учнів</h1>
+      <header className="dashboard-header">
+        <h1 className="dashboard-title">Дашборд успішності учнів</h1>
+        <Link to="/data-entry" className="data-entry-button">
+          Внести результати
+        </Link>
+      </header>
       
       <div className="score-toggle">
         <span className="score-toggle-label">Тип балів:</span>
@@ -449,7 +379,7 @@ const StudentDashboard = () => {
       <div className="category-selector">
         <h2 className="dashboard-subtitle">Виберіть категорію тестів:</h2>
         <div className="category-buttons">
-          {testCategories.map(category => (
+          {categories.map(category => (
             <button
               key={category.id}
               className={`category-button ${selectedCategory === category.id ? 'active' : ''}`}
@@ -465,7 +395,7 @@ const StudentDashboard = () => {
         <div className="dashboard-card">
           <h2 className="dashboard-card-title">Виберіть учня</h2>
           <div className="student-list">
-            {demoStudents.map(student => (
+            {students.map(student => (
               <div 
                 key={student.id} 
                 className={`student-item ${selectedStudent === student.id ? 'active' : ''}`}
@@ -494,7 +424,7 @@ const StudentDashboard = () => {
             <h2 className="dashboard-card-title">
               Прогрес: {getStudentName(selectedStudent)} 
               <span className="category-label">
-                ({testCategories.find(c => c.id === selectedCategory)?.name || 'Всі категорії'})
+                ({categories.find(c => c.id === selectedCategory)?.name || 'Всі категорії'})
               </span>
             </h2>
             <div className="chart-container">
@@ -519,12 +449,12 @@ const StudentDashboard = () => {
                   <Legend />
                   {scoreType === "raw" && (
                     <ReferenceLine y={MIN_PASSING_TEST_SCORE} stroke="red" strokeDasharray="3 3" 
-                      label={{ position: 'insideBottomRight', value: 'Мінімальний прохідний бал', fill: 'red', fontSize: 12 }} 
+                      label={{ position: 'insideBottomRight', value: 'Прохідний бал', fill: 'red', fontSize: 12 }} 
                     />
                   )}
                   {scoreType === "scaled" && (
                     <ReferenceLine y={MIN_PASSING_SCALED_SCORE} stroke="red" strokeDasharray="3 3" 
-                      label={{ position: 'insideBottomRight', value: 'Мінімальний прохідний бал', fill: 'red', fontSize: 12 }} 
+                      label={{ position: 'insideBottomRight', value: 'Прохідний бал', fill: 'red', fontSize: 12 }} 
                     />
                   )}
                   <Line 
@@ -617,13 +547,13 @@ const StudentDashboard = () => {
         <h2 className="dashboard-card-title">
           Порівняння успішності всіх учнів
           <span className="category-label">
-            ({testCategories.find(c => c.id === selectedCategory)?.name || 'Всі категорії'})
+            ({categories.find(c => c.id === selectedCategory)?.name || 'Всі категорії'})
           </span>
         </h2>
         <div className="chart-container">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={demoStudents.map(student => ({
+              data={students.map(student => ({
                 name: student.name,
                 average: scoreType === "raw" 
                   ? getStudentAverage(student.id, selectedCategory) 
