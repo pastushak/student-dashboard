@@ -141,6 +141,35 @@ const StudentDashboard = () => {
     setSelectedStudent(studentId);
     updateIndividualProgress(studentId);
   };
+
+  const updateIndividualProgress = (studentId = selectedStudent) => {
+    if (!studentId || !selectedCategory) return;
+    
+    // Отримуємо тести для вибраної категорії
+    const testsInCategory = tests.filter(test => test.category === selectedCategory);
+    
+    // Фільтруємо результати для вибраного студента і тестів вибраної категорії
+    const studentResults = results
+      .filter(r => r.studentId === studentId && 
+                  testsInCategory.some(test => test.id === r.testId))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    setIndividualProgress(studentResults.map(r => {
+      const test = tests.find(t => t.id === r.testId);
+      const scaledScore = convertToScaledScore(r.score);
+      const passed = isPassing(r.score);
+      
+      return {
+        test: test ? test.name : r.testId,
+        rawScore: r.score,
+        scaledScore,
+        score: scoreType === "raw" ? r.score : scaledScore,
+        maxScore: scoreType === "raw" ? r.maxScore || 32 : 200,
+        passed,
+        date: new Date(r.date).toLocaleDateString('uk-UA')
+      };
+    }));
+  };
   
   const handleCategorySelect = (categoryId) => {
     setSelectedCategory(categoryId);
