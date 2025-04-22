@@ -9,47 +9,77 @@ const getInitialData = () => {
   const savedResults = localStorage.getItem('results');
   
   const defaultStudents = [
-    { id: 1, name: "Векерик Анастасія" },
-    { id: 2, name: "Дидичин Катерина" },
-    { id: 3, name: "Жиляк Олександр" },
-    { id: 4, name: "Коцюр Артем" },
-    { id: 5, name: "Литвинський Максим" },
-    { id: 6, name: "Мацишин Яна" },
-    { id: 7, name: "Маціборко Тетяна" },
-    { id: 8, name: "Осадчий Максим" },
-    { id: 9, name: "Паращук Ангеліна" },
-    { id: 10, name: "Паращук Юлія" },
-    { id: 11, name: "Романюк Романа" },
-    { id: 12, name: "Соколишин Соломія" },
-    { id: 13, name: "Чобанюк Анастасія" },
-    { id: 14, name: "Чорнецька Анастасія" },
-    { id: 15, name: "Якубів Анастасія" }
+    { id: "01", name: "Векерик Анастасія" },
+    { id: "02", name: "Дидичин Катерина" },
+    { id: "03", name: "Жиляк Олександр" },
+    { id: "04", name: "Коцюр Артем" },
+    { id: "05", name: "Литвинський Максим" },
+    { id: "06", name: "Мацишин Яна" },
+    { id: "07", name: "Маціборко Тетяна" },
+    { id: "08", name: "Осадчий Максим" },
+    { id: "09", name: "Паращук Ангеліна" },
+    { id: "10", name: "Паращук Юлія" },
+    { id: "11", name: "Романюк Романа" },
+    { id: "12", name: "Соколишин Соломія" },
+    { id: "13", name: "Чобанюк Анастасія" },
+    { id: "14", name: "Чорнецька Анастасія" },
+    { id: "15", name: "Якубів Анастасія" }
   ];
   
   const defaultCategories = [
-    { id: "own", name: "Власні варіанти" },
+    { id: "own", name: "Вхідні варіанти" },
     { id: "training", name: "Тренувальні тести" }
   ];
   
   const defaultTests = [
-    // Власні варіанти
+    // Вхідні варіанти
     { id: "own1", name: "Варіант 1", category: "own" },
     { id: "own2", name: "Варіант 2", category: "own" },
     { id: "own3", name: "Варіант 3", category: "own" },
     { id: "own4", name: "Варіант 4", category: "own" },
     { id: "own5", name: "Варіант 5", category: "own" },
     
-    // Тренувальні тести (приклад перших 10 з 40)
-    { id: "tr1", name: "Трен. тест 1", category: "training" },
-    { id: "tr2", name: "Трен. тест 2", category: "training" },
-    { id: "tr3", name: "Трен. тест 3", category: "training" },
-    { id: "tr4", name: "Трен. тест 4", category: "training" },
-    { id: "tr5", name: "Трен. тест 5", category: "training" },
-    { id: "tr6", name: "Трен. тест 6", category: "training" },
-    { id: "tr7", name: "Трен. тест 7", category: "training" },
-    { id: "tr8", name: "Трен. тест 8", category: "training" },
-    { id: "tr9", name: "Трен. тест 9", category: "training" },
-    { id: "tr10", name: "Трен. тест 10", category: "training" }
+    // Тренувальні тести (всі 40)
+    { id: "tr01", name: "01", category: "training" },
+    { id: "tr02", name: "02", category: "training" },
+    { id: "tr03", name: "03", category: "training" },
+    { id: "tr04", name: "04", category: "training" },
+    { id: "tr05", name: "05", category: "training" },
+    { id: "tr06", name: "06", category: "training" },
+    { id: "tr07", name: "07", category: "training" },
+    { id: "tr08", name: "08", category: "training" },
+    { id: "tr09", name: "09", category: "training" },
+    { id: "tr10", name: "10", category: "training" },
+    { id: "tr11", name: "11", category: "training" },
+    { id: "tr12", name: "12", category: "training" },
+    { id: "tr13", name: "13", category: "training" },
+    { id: "tr14", name: "14", category: "training" },
+    { id: "tr15", name: "15", category: "training" },
+    { id: "tr16", name: "16", category: "training" },
+    { id: "tr17", name: "17", category: "training" },
+    { id: "tr18", name: "18", category: "training" },
+    { id: "tr19", name: "19", category: "training" },
+    { id: "tr20", name: "20", category: "training" },
+    { id: "tr21", name: "21", category: "training" },
+    { id: "tr22", name: "22", category: "training" },
+    { id: "tr23", name: "23", category: "training" },
+    { id: "tr24", name: "24", category: "training" },
+    { id: "tr25", name: "25", category: "training" },
+    { id: "tr26", name: "26", category: "training" },
+    { id: "tr27", name: "27", category: "training" },
+    { id: "tr28", name: "28", category: "training" },
+    { id: "tr29", name: "29", category: "training" },
+    { id: "tr30", name: "30", category: "training" },
+    { id: "tr31", name: "31", category: "training" },
+    { id: "tr32", name: "32", category: "training" },
+    { id: "tr33", name: "33", category: "training" },
+    { id: "tr34", name: "34", category: "training" },
+    { id: "tr35", name: "35", category: "training" },
+    { id: "tr36", name: "36", category: "training" },
+    { id: "tr37", name: "37", category: "training" },
+    { id: "tr38", name: "38", category: "training" },
+    { id: "tr39", name: "39", category: "training" },
+    { id: "tr40", name: "40", category: "training" }
   ];
   
   return {
@@ -69,10 +99,8 @@ const DataEntryPage = () => {
   const [newResults, setNewResults] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [newTestName, setNewTestName] = useState('');
-  const [isAddingTest, setIsAddingTest] = useState(false);
 
-  // Фільтруємо тести за обраною категорією
+  // Фільтруємо тести за вибраною категорією
   const filteredTests = tests.filter(test => test.category === selectedCategory);
   
   // Ініціалізуємо форму результатів для всіх учнів
@@ -111,41 +139,6 @@ const DataEntryPage = () => {
           : result
       )
     );
-  };
-  
-  // Функція для збереження нового тесту
-  const handleAddTest = () => {
-    if (!newTestName.trim()) {
-      setErrorMessage('Введіть назву тесту');
-      return;
-    }
-    
-    // Генеруємо унікальний ID для нового тесту
-    const newTestId = selectedCategory === 'own' 
-      ? `own${tests.filter(t => t.category === 'own').length + 1}` 
-      : `tr${tests.filter(t => t.category === 'training').length + 1}`;
-    
-    const newTest = {
-      id: newTestId,
-      name: newTestName,
-      category: selectedCategory
-    };
-    
-    // Додаємо новий тест до списку
-    const updatedTests = [...tests, newTest];
-    localStorage.setItem('tests', JSON.stringify(updatedTests));
-    
-    // Оновлюємо локальний стан і скидаємо форму
-    setNewTestName('');
-    setIsAddingTest(false);
-    setSelectedTest(newTestId);
-    
-    // Показуємо повідомлення про успіх
-    setSuccessMessage('Тест успішно додано');
-    setTimeout(() => setSuccessMessage(''), 3000);
-    
-    // Перезавантажуємо сторінку для застосування змін
-    window.location.reload();
   };
   
   // Функція для збереження результатів
@@ -273,53 +266,18 @@ const DataEntryPage = () => {
         </div>
         
         <div className="test-selection">
-          <h2>Крок 2: Виберіть тест або створіть новий</h2>
-          
-          {!isAddingTest ? (
-            <>
-              <div className="test-buttons">
-                {filteredTests.map(test => (
-                  <button
-                    key={test.id}
-                    className={`test-button ${selectedTest === test.id ? 'active' : ''}`}
-                    onClick={() => setSelectedTest(test.id)}
-                  >
-                    {test.name}
-                  </button>
-                ))}
-              </div>
-              <button 
-                className="add-test-button"
-                onClick={() => setIsAddingTest(true)}
+          <h2>Крок 2: Виберіть варіант</h2>
+          <div className="test-buttons">
+            {filteredTests.map(test => (
+              <button
+                key={test.id}
+                className={`test-button ${selectedTest === test.id ? 'active' : ''}`}
+                onClick={() => setSelectedTest(test.id)}
               >
-                + Додати новий тест
+                {test.name}
               </button>
-            </>
-          ) : (
-            <div className="add-test-form">
-              <input
-                type="text"
-                placeholder="Назва нового тесту"
-                value={newTestName}
-                onChange={(e) => setNewTestName(e.target.value)}
-                className="test-name-input"
-              />
-              <div className="add-test-buttons">
-                <button onClick={handleAddTest} className="confirm-button">
-                  Підтвердити
-                </button>
-                <button 
-                  onClick={() => {
-                    setIsAddingTest(false);
-                    setNewTestName('');
-                  }} 
-                  className="cancel-button"
-                >
-                  Скасувати
-                </button>
-              </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
         
         <div className="date-selection">
