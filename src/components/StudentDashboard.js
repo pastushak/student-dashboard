@@ -3,6 +3,7 @@ import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
+import './StudentDashboard.css';
 
 // Демонстраційні дані
 const demoStudents = [
@@ -112,21 +113,21 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="p-4 w-full bg-gray-50">
-      <h1 className="text-2xl font-bold mb-6 text-center text-blue-800">Дашборд успішності учнів</h1>
+    <div className="dashboard">
+      <h1 className="dashboard-title">Дашборд успішності учнів</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-lg font-semibold mb-4">Виберіть учня</h2>
-          <div className="space-y-2">
+      <div className="dashboard-container">
+        <div className="dashboard-card">
+          <h2 className="dashboard-card-title">Виберіть учня</h2>
+          <div className="student-list">
             {demoStudents.map(student => (
               <div 
                 key={student.id} 
-                className={`p-2 cursor-pointer rounded ${selectedStudent === student.id ? 'bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-gray-100'}`}
+                className={`student-item ${selectedStudent === student.id ? 'active' : ''}`}
                 onClick={() => handleStudentSelect(student.id)}
               >
-                <span className="font-medium">{student.name}</span>
-                <span className="ml-2 text-sm text-gray-500">
+                <span className="student-name">{student.name}</span>
+                <span className="student-score">
                   (Середній бал: {getStudentAverage(student.id)})
                 </span>
               </div>
@@ -135,11 +136,11 @@ const StudentDashboard = () => {
         </div>
         
         {selectedStudent && (
-          <div className="bg-white p-4 rounded shadow md:col-span-2">
-            <h2 className="text-lg font-semibold mb-2">
+          <div className="dashboard-card">
+            <h2 className="dashboard-card-title">
               Персональний прогрес: {getStudentName(selectedStudent)}
             </h2>
-            <div className="h-64">
+            <div className="chart-container">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={individualProgress}
@@ -164,10 +165,10 @@ const StudentDashboard = () => {
         )}
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-lg font-semibold mb-2">Середні бали за варіантами</h2>
-          <div className="h-64">
+      <div className="dashboard-grid">
+        <div className="dashboard-card">
+          <h2 className="dashboard-card-title">Середні бали за варіантами</h2>
+          <div className="chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={averageScores}
@@ -184,9 +185,9 @@ const StudentDashboard = () => {
           </div>
         </div>
         
-        <div className="bg-white p-4 rounded shadow">
-          <h2 className="text-lg font-semibold mb-2">Розподіл загальних балів</h2>
-          <div className="h-64">
+        <div className="dashboard-card">
+          <h2 className="dashboard-card-title">Розподіл загальних балів</h2>
+          <div className="chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -211,9 +212,9 @@ const StudentDashboard = () => {
         </div>
       </div>
       
-      <div className="mt-6 bg-white p-4 rounded shadow">
-        <h2 className="text-lg font-semibold mb-4">Порівняння успішності всіх учнів</h2>
-        <div className="h-64">
+      <div className="dashboard-card" style={{ marginTop: '24px' }}>
+        <h2 className="dashboard-card-title">Порівняння успішності всіх учнів</h2>
+        <div className="chart-container">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={demoStudents.map(student => ({
