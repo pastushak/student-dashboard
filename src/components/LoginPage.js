@@ -1,81 +1,90 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
+import logo from '../logo.svg';
 
-function LoginPage() {
-  const [accessCode, setAccessCode] = useState('');
-  const [role, setRole] = useState('student'); // 'student' або 'teacher'
+const LoginPage = ({ onLogin }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Очищаємо попередні помилки
-    setError('');
+  // Тестові облікові записи
+  const accounts = [
+    { username: 'admin', password: 'admin123', role: 'admin' },
+    { username: 'analytics', password: 'analytics2025', role: 'analytics' }, // Роль для аналітики
+    { username: 'teacher', password: 'teacher2025', role: 'teacher' }, // Роль для вводу даних
+    // Облікові записи учнів, де username це їх id, а пароль - прізвище латиницею з малої літери
+    { username: '01', password: 'vekeryk', role: 'student', id: '01' },
+    { username: '02', password: 'dydychyn', role: 'student', id: '02' },
+    { username: '03', password: 'zhyliak', role: 'student', id: '03' },
+    { username: '04', password: 'kotsiur', role: 'student', id: '04' },
+    { username: '05', password: 'lytvynskyi', role: 'student', id: '05' },
+    { username: '06', password: 'matsyshyn', role: 'student', id: '06' },
+    { username: '07', password: 'matsiborko', role: 'student', id: '07' },
+    { username: '08', password: 'osadchyi', role: 'student', id: '08' },
+    { username: '09', password: 'parashchuk', role: 'student', id: '09' },
+    { username: '10', password: 'parashchuk', role: 'student', id: '10' },
+    { username: '11', password: 'romaniuk', role: 'student', id: '11' },
+    { username: '12', password: 'sokolyshyn', role: 'student', id: '12' },
+    { username: '13', password: 'chobaniuk', role: 'student', id: '13' },
+    { username: '14', password: 'chornetska', role: 'student', id: '14' },
+    { username: '15', password: 'yakubiv', role: 'student', id: '15' },
+  ];
 
-    if (role === 'teacher' && accessCode === 'teacher123') {
-      localStorage.setItem('userRole', 'teacher');
-      navigate('/'); // Перенаправлення на дашборд
-    } else if (role === 'student') {
-      // Перевірка, чи існує учень з таким кодом
-      const students = JSON.parse(localStorage.getItem('students') || '[]');
-      const student = students.find(s => s.id === accessCode);
-      
-      if (student) {
-        localStorage.setItem('userRole', 'student');
-        localStorage.setItem('studentId', student.id);
-        navigate('/'); // Перенаправлення на дашборд учня
-      } else {
-        setError('Неправильний код доступу. Спробуйте ще раз.');
-      }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Пошук облікового запису
+    const account = accounts.find(acc => acc.username === username && acc.password === password);
+    
+    if (account) {
+      // Передаємо інформацію про роль і, якщо це учень, також його ідентифікатор
+      onLogin({
+        role: account.role,
+        ...(account.role === 'student' && { studentId: account.id })
+      });
     } else {
-      setError('Неправильний код доступу. Спробуйте ще раз.');
+      setError('Невірний логін або пароль');
     }
   };
 
   return (
     <div className="login-container">
-      <h1 className="login-title">Вхід до дашборду успішності</h1>
-      
-      {error && <div className="login-error">{error}</div>}
-      
-      <div className="role-selector">
-        <button
-          className={`role-button ${role === 'student' ? 'active' : ''}`}
-          onClick={() => setRole('student')}
-        >
-          Я учень
-        </button>
-        <button
-          className={`role-button ${role === 'teacher' ? 'active' : ''}`}
-          onClick={() => setRole('teacher')}
-        >
-          Я вчитель
-        </button>
-      </div>
-      
-      <div className="login-form">
-        <label className="login-label">
-          Введіть код доступу:
-          <input 
-            type="text" 
-            value={accessCode}
-            onChange={(e) => setAccessCode(e.target.value)}
-            className="login-input"
-            placeholder={role === 'student' ? "Ваш персональний код" : "Код вчителя"}
-          />
-        </label>
+      <div className="login-card">
+        <div className="login-header">
+          <img src={logo} alt="Логотип" className="login-logo" />
+          <h1>Моніторинг НМТ з математики</h1>
+        </div>
         
-        <button onClick={handleLogin} className="login-button">
-          Увійти
-        </button>
-      </div>
-      
-      <div className="login-hint">
-        <p>Для вчителя використовуйте код: teacher123</p>
-        <p>Для учня використовуйте свій ID: 01, 02, 03, ...</p>
+        <form onSubmit={handleSubmit} className="login-form">
+          {error && <div className="error-message">{error}</div>}
+          
+          <div className="input-group">
+            <label htmlFor="username">Логін</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div className="input-group">
+            <label htmlFor="password">Пароль</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          
+          <button type="submit" className="login-button">Увійти</button>
+        </form>
       </div>
     </div>
   );
-}
+};
 
 export default LoginPage;

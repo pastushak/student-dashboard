@@ -1,283 +1,198 @@
+/* DataEntryPage.css */
 .data-entry-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f5f5f5;
-  }
-  
-  .data-entry-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-  }
-  
-  .data-entry-header h1 {
-    font-size: 24px;
-    color: #1e40af;
-    margin: 0;
-  }
-  
-  .back-button {
-    display: inline-block;
-    padding: 10px 16px;
-    background-color: #3b82f6;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-weight: 500;
-    transition: background-color 0.2s;
-  }
-  
-  .back-button:hover {
-    background-color: #2563eb;
-  }
-  
-  .success-message,
-  .error-message {
-    padding: 10px 15px;
-    margin-bottom: 20px;
-    border-radius: 4px;
-    font-weight: 500;
-  }
-  
-  .success-message {
-    background-color: #d1fae5;
-    color: #047857;
-    border: 1px solid #047857;
-  }
-  
-  .error-message {
-    background-color: #fee2e2;
-    color: #b91c1c;
-    border: 1px solid #b91c1c;
-  }
-  
-  .data-controls {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-  }
-  
-  .export-import {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .export-button {
-    padding: 8px 16px;
-    background-color: #4f46e5;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  
-  .import-label {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #6366f1;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  
-  .import-input {
-    display: none;
-  }
-  
-  .selection-container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
-  }
-  
-  .category-selection,
-  .test-selection,
-  .date-selection {
-    margin-bottom: 25px;
-  }
-  
-  .category-selection h2,
-  .test-selection h2,
-  .date-selection h2 {
-    font-size: 18px;
-    margin-bottom: 15px;
-    color: #1f2937;
-    font-weight: 600;
-  }
-  
-  .category-buttons,
-  .test-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 15px;
-  }
-  
-  .category-button,
-  .test-button {
-    padding: 8px 16px;
-    background-color: #e5e7eb;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
-  }
-  
-  .category-button:hover,
-  .test-button:hover {
-    background-color: #d1d5db;
-  }
-  
-  .category-button.active,
-  .test-button.active {
-    background-color: #3b82f6;
-    color: white;
-  }
-  
-  .add-test-button {
-    padding: 8px 16px;
-    background-color: #10b981;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  
-  .add-test-form {
-    display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.data-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #3498db;
+}
+
+.data-entry-header h1 {
+  color: #2c3e50;
+  margin: 0;
+  font-size: 24px;
+}
+
+.logout-btn {
+  padding: 8px 16px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b;
+}
+
+.data-entry-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.category-selector {
+  display: flex;
+  gap: 10px;
+}
+
+.category-selector button {
+  padding: 8px 16px;
+  background-color: #ecf0f1;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-selector button.active {
+  background-color: #3498db;
+  color: white;
+}
+
+.test-selector select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 200px;
+}
+
+.conversion-table-btn {
+  padding: 8px 16px;
+  background-color: #9b59b6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: auto;
+}
+
+.conversion-table-btn:hover {
+  background-color: #8e44ad;
+}
+
+.conversion-table-container {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  border-left: 4px solid #9b59b6;
+}
+
+.conversion-table-container h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.conversion-table {
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.conversion-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.conversion-table th, .conversion-table td {
+  padding: 8px 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.conversion-table th {
+  background-color: #f2f2f2;
+  position: sticky;
+  top: 0;
+}
+
+.student-scores-container {
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.student-scores-container h2 {
+  padding: 15px;
+  margin: 0;
+  background-color: #f2f2f2;
+  color: #2c3e50;
+  font-size: 18px;
+  border-bottom: 1px solid #ddd;
+}
+
+.student-scores-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.student-scores-table th, .student-scores-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.student-scores-table th {
+  background-color: #f9f9f9;
+  font-weight: bold;
+}
+
+.student-scores-table td:nth-child(2),
+.student-scores-table td:nth-child(3) {
+  text-align: center;
+}
+
+.student-scores-table input {
+  width: 60px;
+  padding: 6px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.no-test-selected {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .data-entry-controls {
     flex-direction: column;
-    gap: 10px;
+    align-items: stretch;
   }
   
-  .test-name-input {
-    padding: 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 16px;
+  .conversion-table-btn {
+    margin-left: 0;
   }
   
-  .add-test-buttons {
-    display: flex;
-    gap: 10px;
+  .student-scores-table {
+    font-size: 14px;
   }
   
-  .confirm-button {
-    padding: 8px 16px;
-    background-color: #10b981;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
+  .student-scores-table input {
+    width: 50px;
   }
-  
-  .cancel-button {
-    padding: 8px 16px;
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  
-  .date-input {
-    padding: 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 16px;
-  }
-  
-  .results-form {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  .results-form h2 {
-    font-size: 18px;
-    margin-bottom: 20px;
-    color: #1f2937;
-    font-weight: 600;
-  }
-  
-  .results-table {
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 20px;
-  }
-  
-  .results-header {
-    display: grid;
-    grid-template-columns: 1fr 120px 120px;
-    background-color: #f3f4f6;
-    padding: 12px 15px;
-    font-weight: 600;
-    color: #1f2937;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .results-row {
-    display: grid;
-    grid-template-columns: 1fr 120px 120px;
-    padding: 10px 15px;
-    border-bottom: 1px solid #e5e7eb;
-  }
-  
-  .results-row:last-child {
-    border-bottom: none;
-  }
-  
-  .results-row:nth-child(even) {
-    background-color: #f9fafb;
-  }
-  
-  .student-column {
-    display: flex;
-    align-items: center;
-  }
-  
-  .score-input {
-    width: 60px;
-    padding: 8px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    text-align: center;
-  }
-  
-  .failed-score {
-    color: #ef4444;
-    font-weight: 500;
-  }
-  
-  .save-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-  }
-  
-  .save-button {
-    padding: 12px 24px;
-    background-color: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 16px;
-    transition: background-color 0.2s;
-  }
-  
-  .save-button:hover {
-    background-color: #2563eb;
-  }
+}
