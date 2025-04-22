@@ -18,6 +18,11 @@
   margin: 0;
 }
 
+.dashboard-controls {
+  display: flex;
+  gap: 10px;
+}
+
 .data-entry-button {
   display: inline-block;
   padding: 10px 16px;
@@ -31,6 +36,20 @@
 
 .data-entry-button:hover {
   background-color: #059669;
+}
+
+.logout-button {
+  padding: 10px 16px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background-color: #dc2626;
 }
 
 .dashboard-subtitle {
@@ -193,4 +212,71 @@
   .dashboard-grid {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+/* Стилі для екрану входу */
+.login-container {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 30px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+  font-size: 24px;
+  color: #1e40af;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-label {
+  display: block;
+  font-weight: 500;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.login-button {
+  padding: 12px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #2563eb;
+}
+
+.login-hint {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #6b7280;
 }

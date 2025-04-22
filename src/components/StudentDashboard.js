@@ -43,7 +43,7 @@ const getStoredData = () => {
     { id: "own4", name: "Варіант 4", category: "own" },
     { id: "own5", name: "Варіант 5", category: "own" },
     
-    // Тренувальні тести (приклад перших 10 з 40)
+    // Тренувальні тести
     { id: "tr1", name: "Трен. тест 1", category: "training" },
     { id: "tr2", name: "Трен. тест 2", category: "training" },
     { id: "tr3", name: "Трен. тест 3", category: "training" },
@@ -56,19 +56,8 @@ const getStoredData = () => {
     { id: "tr10", name: "Трен. тест 10", category: "training" }
   ];
   
-  // Приклад демо-результатів
-  const defaultResults = [
-    // Векерик Анастасія
-    { studentId: 1, testId: "own1", score: 28, maxScore: 32, date: "2025-03-01" },
-    { studentId: 1, testId: "own2", score: 30, maxScore: 32, date: "2025-03-15" },
-    { studentId: 1, testId: "own3", score: 31, maxScore: 32, date: "2025-04-01" },
-    
-    // Дидичин Катерина
-    { studentId: 2, testId: "own1", score: 24, maxScore: 32, date: "2025-03-01" },
-    { studentId: 2, testId: "own2", score: 26, maxScore: 32, date: "2025-03-15" },
-    
-    // І т.д. для інших учнів і тестів...
-  ];
+  // Початковий масив результатів (пустий)
+  const defaultResults = [];
   
   return {
     students: savedStudents ? JSON.parse(savedStudents) : defaultStudents,
@@ -125,7 +114,17 @@ const StudentDashboard = () => {
   // Отримуємо дані з локального сховища
   const { students, categories, tests, results } = getStoredData();
   
-  const [selectedStudent, setSelectedStudent] = useState(null);
+  // Отримуємо дані авторизації
+  const userRole = localStorage.getItem('userRole');
+  const studentId = localStorage.getItem('studentId');
+  
+  // Додаємо стани для авторизації
+  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(userRole));
+  const [loginCode, setLoginCode] = useState('');
+  const [loginError, setLoginError] = useState('');
+  
+  // Стандартні стани дашборду
+  const [selectedStudent, setSelectedStudent] = useState(userRole === 'student' ? parseInt(studentId) : null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [scoreType, setScoreType] = useState("raw"); // "raw" або "scaled"
   const [filteredTests, setFilteredTests] = useState([]);
@@ -143,6 +142,44 @@ const StudentDashboard = () => {
   const isPassing = (testScore) => {
     return testScore >= MIN_PASSING_TEST_SCORE;
   };
+  
+  // Функція для отримання тільки прізвища
+  const getStudentSurname = (fullName) => {
+    if (!fullName) return '';
+    const nameParts = fullName.split(' ');
+    return nameParts[0];
+  };
+
+  // Функція входу
+  const handleLogin = () => {
+    // Перевірка коду вчителя (можна змінити на будь-який інший код)
+    if (loginCode === 'teacher123') {
+      localStorage.setItem('userRole', 'teacher');
+      setIsLoggedIn(true);
+      return;
+    }
+    
+    // Перевірка коду учня (використовуємо ID)
+    const studentIds = students.map(s => s.id.toString());
+    if (studentIds.includes(loginCode)) {
+      localStorage.setItem('userRole', 'student');
+      localStorage.setItem('studentId', loginCode);
+      setIsLoggedIn(true);
+      setSelectedStudent(parseInt(loginCode));
+      return;
+    }
+    
+    // Якщо код не підходить
+    setLoginError('Невірний код доступу. Спробуйте ще раз.');
+  };
+
+  // Функція виходу
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('studentId');
+    setIsLoggedIn(false);
+    setLoginCode('');
+  };
 
   useEffect(() => {
     // Встановлюємо першу категорію як вибрану за замовчуванням
@@ -156,11 +193,11 @@ const StudentDashboard = () => {
       setFilteredTests(filtered);
     }
     
-    // Встановлюємо першого студента як вибраного за замовчуванням
-    if (students.length > 0 && !selectedStudent) {
+    // Встановлюємо першого студента як вибраного за замовчуванням для вчителя
+    if (userRole === 'teacher' && students.length > 0 && !selectedStudent) {
       handleStudentSelect(students[0].id);
     }
-  }, [selectedCategory, selectedStudent, categories, students, tests]);
+  }, [selectedCategory, selectedStudent, categories, students, tests, userRole]);
   
   useEffect(() => {
     // Розрахунок розподілу балів за шкалою 100-200
@@ -174,7 +211,13 @@ const StudentDashboard = () => {
         { name: "Не склав", range: [0, 99], count: 0 }
       ];
       
-      results.forEach(result => {
+      // Фільтруємо результати за роллю
+      let relevantResults = results;
+      if (userRole === 'student') {
+        relevantResults = results.filter(r => r.studentId === parseInt(studentId));
+      }
+      
+      relevantResults.forEach(result => {
         const scaledScore = convertToScaledScore(result.score);
         const range = scoreRanges.find(sr => 
           scaledScore >= sr.range[0] && scaledScore <= sr.range[1]
@@ -196,7 +239,13 @@ const StudentDashboard = () => {
         { name: "Не склав", range: [0, 4], count: 0 }
       ];
       
-      results.forEach(result => {
+      // Фільтруємо результати за роллю
+      let relevantResults = results;
+      if (userRole === 'student') {
+        relevantResults = results.filter(r => r.studentId === parseInt(studentId));
+      }
+      
+      relevantResults.forEach(result => {
         const range = scoreRanges.find(sr => 
           result.score >= sr.range[0] && result.score <= sr.range[1]
         );
@@ -207,7 +256,7 @@ const StudentDashboard = () => {
       
       setOverallDistribution(scoreRanges);
     }
-  }, [scoreType, results]);
+  }, [scoreType, results, userRole, studentId]);
   
   useEffect(() => {
     if (!selectedCategory) return;
@@ -216,7 +265,12 @@ const StudentDashboard = () => {
     const testsInCategory = tests.filter(test => test.category === selectedCategory);
     
     const avgByTest = testsInCategory.map(test => {
-      const testResults = results.filter(r => r.testId === test.id);
+      // Фільтруємо результати за роллю
+      let testResults = results.filter(r => r.testId === test.id);
+      if (userRole === 'student') {
+        testResults = testResults.filter(r => r.studentId === parseInt(studentId));
+      }
+      
       if (testResults.length === 0) return { 
         test: test.name, 
         avgRawScore: 0,
@@ -242,7 +296,7 @@ const StudentDashboard = () => {
     });
     
     setAverageScores(avgByTest);
-  }, [selectedCategory, tests, results]);
+  }, [selectedCategory, tests, results, userRole, studentId]);
   
   useEffect(() => {
     if (!selectedStudent || !selectedCategory) return;
@@ -263,7 +317,7 @@ const StudentDashboard = () => {
   const handleScoreTypeToggle = () => {
     setScoreType(prev => prev === "raw" ? "scaled" : "raw");
   };
-  
+
   const updateIndividualProgress = (studentId = selectedStudent) => {
     if (!studentId || !selectedCategory) return;
     
@@ -351,139 +405,209 @@ const StudentDashboard = () => {
     return scoreType === "raw" ? 32 : 200;
   };
 
+// Екран входу, якщо користувач не авторизований
+if (!isLoggedIn) {
   return (
-    <div className="dashboard">
-      <header className="dashboard-header">
-        <h1 className="dashboard-title">Дашборд успішності учнів</h1>
-        <Link to="/data-entry" className="data-entry-button">
-          Внести результати
-        </Link>
-      </header>
+    <div className="login-container">
+      <h1 className="login-title">Вхід до дашборду успішності</h1>
       
-      <div className="score-toggle">
-        <span className="score-toggle-label">Тип балів:</span>
-        <button 
-          className={`score-toggle-button ${scoreType === "raw" ? 'active' : ''}`}
-          onClick={() => setScoreType("raw")}
-        >
-          Тестові бали (0-32)
-        </button>
-        <button 
-          className={`score-toggle-button ${scoreType === "scaled" ? 'active' : ''}`}
-          onClick={() => setScoreType("scaled")}
-        >
-          Шкала 100-200
-        </button>
-      </div>
+      {loginError && <div className="login-error">{loginError}</div>}
       
-      <div className="category-selector">
-        <h2 className="dashboard-subtitle">Виберіть категорію тестів:</h2>
-        <div className="category-buttons">
-          {categories.map(category => (
-            <button
-              key={category.id}
-              className={`category-button ${selectedCategory === category.id ? 'active' : ''}`}
-              onClick={() => handleCategorySelect(category.id)}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
-      </div>
-      
-      <div className="dashboard-container">
-        <div className="dashboard-card">
-          <h2 className="dashboard-card-title">Виберіть учня</h2>
-          <div className="student-list">
-            {students.map(student => (
-              <div 
-                key={student.id} 
-                className={`student-item ${selectedStudent === student.id ? 'active' : ''}`}
-                onClick={() => handleStudentSelect(student.id)}
-              >
-                <span className="student-name">{student.name}</span>
-                <div className="student-stats">
-                  <span className="student-score">
-                    {getScoreLabel()}: {
-                      scoreType === "raw" 
-                      ? getStudentAverage(student.id, selectedCategory) 
-                      : getStudentAverage(student.id, selectedCategory, true)
-                    }
-                  </span>
-                  <span className="student-pass-rate">
-                    Склав: {getStudentPassRate(student.id, selectedCategory)}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="login-form">
+        <label className="login-label">
+          Введіть код доступу:
+          <input 
+            type="text" 
+            value={loginCode}
+            onChange={(e) => setLoginCode(e.target.value)}
+            className="login-input"
+            placeholder="Код учня або вчителя"
+          />
+        </label>
         
-        {selectedStudent && (
-          <div className="dashboard-card">
-            <h2 className="dashboard-card-title">
-              Прогрес: {getStudentName(selectedStudent)} 
-              <span className="category-label">
-                ({categories.find(c => c.id === selectedCategory)?.name || 'Всі категорії'})
-              </span>
-            </h2>
-            <div className="chart-container">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={individualProgress}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="test" />
-                  <YAxis domain={[0, getMaxScore()]} />
-                  <Tooltip 
-                    formatter={(value, name, props) => {
-                      // Додаємо статус "склав"/"не склав" у тултіп
-                      if (name === getScoreLabel()) {
-                        const passed = props.payload.passed;
-                        return [`${value} (${passed ? 'Склав' : 'Не склав'})`, name];
-                      }
-                      return [value, name];
-                    }}
-                  />
-                  <Legend />
-                  {scoreType === "raw" && (
-                    <ReferenceLine y={MIN_PASSING_TEST_SCORE} stroke="red" strokeDasharray="3 3" 
-                      label={{ position: 'insideBottomRight', value: 'Прохідний бал', fill: 'red', fontSize: 12 }} 
-                    />
-                  )}
-                  {scoreType === "scaled" && (
-                    <ReferenceLine y={MIN_PASSING_SCALED_SCORE} stroke="red" strokeDasharray="3 3" 
-                      label={{ position: 'insideBottomRight', value: 'Прохідний бал', fill: 'red', fontSize: 12 }} 
-                    />
-                  )}
-                  <Line 
-                    type="monotone" 
-                    dataKey="score" 
-                    name={getScoreLabel()} 
-                    stroke="#8884d8" 
-                    activeDot={{ r: 8 }}
-                    // Встановлюємо колір точок залежно від того, склав студент тест чи ні
-                    dot={(props) => {
-                      const { cx, cy, payload } = props;
-                      return (
-                        <circle 
-                          cx={cx} 
-                          cy={cy} 
-                          r={5} 
-                          fill={payload.passed ? "#8884d8" : "#ff0000"}
-                        />
-                      );
-                    }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        )}
+        <button 
+          onClick={handleLogin} 
+          className="login-button"
+        >
+          Увійти
+        </button>
       </div>
       
-      <div className="dashboard-grid">
+      <div className="login-hint">
+        <p>Для вчителя використовуйте код: teacher123</p>
+        <p>Для учня використовуйте свій ID: 1, 2, 3, ...</p>
+      </div>
+    </div>
+  );
+}
+
+// Основний дашборд для авторизованого користувача
+return (
+  <div className="dashboard">
+    <header className="dashboard-header">
+      <h1 className="dashboard-title">Дашборд успішності учнів</h1>
+      <div className="dashboard-controls">
+        {userRole === 'teacher' && (
+          <Link to="/data-entry" className="data-entry-button">
+            Внести результати
+          </Link>
+        )}
+        <button onClick={handleLogout} className="logout-button">
+          Вийти
+        </button>
+      </div>
+    </header>
+    
+    <div className="score-toggle">
+      <span className="score-toggle-label">Тип балів:</span>
+      <button 
+        className={`score-toggle-button ${scoreType === "raw" ? 'active' : ''}`}
+        onClick={() => setScoreType("raw")}
+      >
+        Тестові бали (0-32)
+      </button>
+      <button 
+        className={`score-toggle-button ${scoreType === "scaled" ? 'active' : ''}`}
+        onClick={() => setScoreType("scaled")}
+      >
+        Шкала 100-200
+      </button>
+    </div>
+    
+    <div className="category-selector">
+      <h2 className="dashboard-subtitle">Виберіть категорію тестів:</h2>
+      <div className="category-buttons">
+        {categories.map(category => (
+          <button
+            key={category.id}
+            className={`category-button ${selectedCategory === category.id ? 'active' : ''}`}
+            onClick={() => handleCategorySelect(category.id)}
+          >
+            {category.name}
+          </button>
+        ))}
+      </div>
+    </div>
+    
+    <div className="dashboard-container">
+      <div className="dashboard-card">
+        <h2 className="dashboard-card-title">
+          {userRole === 'teacher' ? 'Виберіть учня' : 'Ваш профіль'}
+        </h2>
+        <div className="student-list">
+          {userRole === 'teacher' 
+            ? students.map(student => (
+                <div 
+                  key={student.id} 
+                  className={`student-item ${selectedStudent === student.id ? 'active' : ''}`}
+                  onClick={() => handleStudentSelect(student.id)}
+                >
+                  <span className="student-name">{student.name}</span>
+                  <div className="student-stats">
+                    <span className="student-score">
+                      {getScoreLabel()}: {
+                        scoreType === "raw" 
+                        ? getStudentAverage(student.id, selectedCategory) 
+                        : getStudentAverage(student.id, selectedCategory, true)
+                      }
+                    </span>
+                    <span className="student-pass-rate">
+                      Склав: {getStudentPassRate(student.id, selectedCategory)}
+                    </span>
+                  </div>
+                </div>
+              ))
+            : students
+                .filter(student => student.id === parseInt(studentId))
+                .map(student => (
+                  <div 
+                    key={student.id} 
+                    className="student-item active"
+                  >
+                    <span className="student-name">{student.name}</span>
+                    <div className="student-stats">
+                      <span className="student-score">
+                        {getScoreLabel()}: {
+                          scoreType === "raw" 
+                          ? getStudentAverage(student.id, selectedCategory) 
+                          : getStudentAverage(student.id, selectedCategory, true)
+                        }
+                      </span>
+                      <span className="student-pass-rate">
+                        Склав: {getStudentPassRate(student.id, selectedCategory)}
+                      </span>
+                    </div>
+                  </div>
+                ))
+          }
+        </div>
+      </div>
+      
+      {selectedStudent && (
+        <div className="dashboard-card">
+          <h2 className="dashboard-card-title">
+            Прогрес: {getStudentName(selectedStudent)} 
+            <span className="category-label">
+              ({categories.find(c => c.id === selectedCategory)?.name || 'Всі категорії'})
+            </span>
+          </h2>
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={individualProgress}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="test" />
+                <YAxis domain={[0, getMaxScore()]} />
+                <Tooltip 
+                  formatter={(value, name, props) => {
+                    // Додаємо статус "склав"/"не склав" у тултіп
+                    if (name === getScoreLabel()) {
+                      const passed = props.payload.passed;
+                      return [`${value} (${passed ? 'Склав' : 'Не склав'})`, name];
+                    }
+                    return [value, name];
+                  }}
+                />
+                <Legend />
+                {scoreType === "raw" && (
+                  <ReferenceLine y={MIN_PASSING_TEST_SCORE} stroke="red" strokeDasharray="3 3" 
+                    label={{ position: 'insideBottomRight', value: 'Прохідний бал', fill: 'red', fontSize: 12 }} 
+                  />
+                )}
+                {scoreType === "scaled" && (
+                  <ReferenceLine y={MIN_PASSING_SCALED_SCORE} stroke="red" strokeDasharray="3 3" 
+                    label={{ position: 'insideBottomRight', value: 'Прохідний бал', fill: 'red', fontSize: 12 }} 
+                  />
+                )}
+                <Line 
+                  type="monotone" 
+                  dataKey="score" 
+                  name={getScoreLabel()} 
+                  stroke="#8884d8" 
+                  activeDot={{ r: 8 }}
+                  // Встановлюємо колір точок залежно від того, склав студент тест чи ні
+                  dot={(props) => {
+                    const { cx, cy, payload } = props;
+                    return (
+                      <circle 
+                        cx={cx} 
+                        cy={cy} 
+                        r={5} 
+                        fill={payload.passed ? "#8884d8" : "#ff0000"}
+                      />
+                    );
+                  }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+    </div>
+
+    <div className="dashboard-grid">
         <div className="dashboard-card">
           <h2 className="dashboard-card-title">Середні бали за варіантами</h2>
           <div className="chart-container">
@@ -542,45 +666,48 @@ const StudentDashboard = () => {
           </div>
         </div>
       </div>
-      
-      <div className="dashboard-card" style={{ marginTop: '24px' }}>
-        <h2 className="dashboard-card-title">
-          Порівняння успішності всіх учнів
-          <span className="category-label">
-            ({categories.find(c => c.id === selectedCategory)?.name || 'Всі категорії'})
-          </span>
-        </h2>
-        <div className="chart-container">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={students.map(student => ({
-                name: student.name,
-                average: scoreType === "raw" 
-                  ? getStudentAverage(student.id, selectedCategory) 
-                  : getStudentAverage(student.id, selectedCategory, true)
-              }))}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis domain={[0, scoreType === "raw" ? 32 : 200]} />
-              <Tooltip />
-              <Legend />
-              <Bar 
-                dataKey="average" 
-                name={getAverageLabel()} 
-                fill="#8884d8" 
-              />
-              {scoreType === "raw" && (
-                <ReferenceLine y={MIN_PASSING_TEST_SCORE} stroke="red" strokeDasharray="3 3" />
-              )}
-              {scoreType === "scaled" && (
-                <ReferenceLine y={MIN_PASSING_SCALED_SCORE} stroke="red" strokeDasharray="3 3" />
-              )}
-            </BarChart>
-          </ResponsiveContainer>
+
+{/* Діаграма порівняння успішності всіх учнів (тільки для ролі вчителя) */}
+{userRole === 'teacher' && (
+        <div className="dashboard-card" style={{ marginTop: '24px' }}>
+          <h2 className="dashboard-card-title">
+            Порівняння успішності всіх учнів
+            <span className="category-label">
+              ({categories.find(c => c.id === selectedCategory)?.name || 'Всі категорії'})
+            </span>
+          </h2>
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={students.map(student => ({
+                  name: getStudentSurname(student.name), // Показуємо тільки прізвище
+                  average: scoreType === "raw" 
+                    ? getStudentAverage(student.id, selectedCategory) 
+                    : getStudentAverage(student.id, selectedCategory, true)
+                }))}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis domain={[0, scoreType === "raw" ? 32 : 200]} />
+                <Tooltip />
+                <Legend />
+                <Bar 
+                  dataKey="average" 
+                  name={getAverageLabel()} 
+                  fill="#8884d8" 
+                />
+                {scoreType === "raw" && (
+                  <ReferenceLine y={MIN_PASSING_TEST_SCORE} stroke="red" strokeDasharray="3 3" />
+                )}
+                {scoreType === "scaled" && (
+                  <ReferenceLine y={MIN_PASSING_SCALED_SCORE} stroke="red" strokeDasharray="3 3" />
+                )}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
