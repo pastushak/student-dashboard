@@ -1,49 +1,48 @@
 import React, { useState } from 'react';
 import './LoginPage.css';
 import logo from '../logo.svg';
+import { supabase } from '../supabase';
 
 const LoginPage = ({ onLogin }) => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Тестові облікові записи
-  const accounts = [
-    { username: 'admin', password: 'admin123', role: 'admin' },
-    { username: 'analytics', password: 'analytics2025', role: 'analytics' }, // Роль для аналітики
-    { username: 'teacher', password: 'teacher2025', role: 'teacher' }, // Роль для вводу даних
-    // Облікові записи учнів, де username це їх id, а пароль - прізвище латиницею з малої літери
-    { username: '01', password: 'vekeryk', role: 'student', id: '01' },
-    { username: '02', password: 'dydychyn', role: 'student', id: '02' },
-    { username: '03', password: 'zhyliak', role: 'student', id: '03' },
-    { username: '04', password: 'kotsiur', role: 'student', id: '04' },
-    { username: '05', password: 'lytvynskyi', role: 'student', id: '05' },
-    { username: '06', password: 'matsyshyn', role: 'student', id: '06' },
-    { username: '07', password: 'matsiborko', role: 'student', id: '07' },
-    { username: '08', password: 'osadchyi', role: 'student', id: '08' },
-    { username: '09', password: 'parashchuk', role: 'student', id: '09' },
-    { username: '10', password: 'parashchuk', role: 'student', id: '10' },
-    { username: '11', password: 'romaniuk', role: 'student', id: '11' },
-    { username: '12', password: 'sokolyshyn', role: 'student', id: '12' },
-    { username: '13', password: 'chobaniuk', role: 'student', id: '13' },
-    { username: '14', password: 'chornetska', role: 'student', id: '14' },
-    { username: '15', password: 'yakubiv', role: 'student', id: '15' },
-  ];
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     
-    // Пошук облікового запису
-    const account = accounts.find(acc => acc.username === username && acc.password === password);
-    
-    if (account) {
-      // Передаємо інформацію про роль і, якщо це учень, також його ідентифікатор
-      onLogin({
-        role: account.role,
-        ...(account.role === 'student' && { studentId: account.id })
+    try {
+      // Вхід користувача через Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
       });
-    } else {
-      setError('Невірний логін або пароль');
+      
+      if (error) throw error;
+      
+      // Отримуємо профіль користувача з таблиці profiles
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (profileError) throw profileError;
+      
+      // Передаємо дані про користувача в батьківський компонент
+      onLogin({
+        email: email,
+        password: password
+      });
+      
+    } catch (error) {
+      console.error("Помилка входу:", error.message);
+      setError(error.message || 'Невірний логін або пароль');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,12 +58,12 @@ const LoginPage = ({ onLogin }) => {
           {error && <div className="error-message">{error}</div>}
           
           <div className="input-group">
-            <label htmlFor="username">Логін</label>
+            <label htmlFor="email">Email</label>
             <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -80,8 +79,20 @@ const LoginPage = ({ onLogin }) => {
             />
           </div>
           
-          <button type="submit" className="login-button">Увійти</button>
+          <button 
+            type="submit" 
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? 'Вхід...' : 'Увійти'}
+          </button>
         </form>
+        
+        <div className="login-info">
+          <p>Для доступу використовуйте надані облікові дані:</p>
+          <p>Email: ваш.email@приклад.com</p>
+          <p>Пароль: ************</p>
+        </div>
       </div>
     </div>
   );

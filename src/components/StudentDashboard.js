@@ -4,6 +4,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
+import { supabase } from '../supabase'; // Додайте цей імпорт
 
 const StudentDashboard = ({ studentId, userRole }) => {
   // Дані учнів
@@ -105,30 +106,75 @@ const StudentDashboard = ({ studentId, userRole }) => {
   });
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [allResults, setAllResults] = useState({});
+  const [loading, setLoading] = useState(true); // Додаємо індикатор завантаження
 
   // Фільтруємо учнів відповідно до ролі
   const displayStudents = userRole === 'student' 
     ? students.filter(s => s.id === studentId)
     : students;
 
-  // Завантаження збережених результатів
+  // Завантаження збережених результатів з Supabase
   useEffect(() => {
-    const savedResults = localStorage.getItem('testResults');
-    if (savedResults) {
-      const parsedResults = JSON.parse(savedResults);
-      setResults(parsedResults);
-      
-      // Для учня також завантажуємо результати всіх для порівняння
-      if (userRole === 'student') {
-        setAllResults(parsedResults);
+    const fetchResults = async () => {
+      setLoading(true);
+      try {
+        // Отримуємо всі результати тестів або тільки для конкретного учня
+        let query = supabase.from('test_results').select('*');
+        
+        // Якщо це учень, фільтруємо результати тільки для цього учня
+        if (userRole === 'student' && studentId) {
+          query = query.eq('student_id', studentId);
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error('Помилка при завантаженні даних:', error);
+          return;
+        }
+        
+        // Перетворюємо результати у потрібний формат
+        const formattedResults = {};
+        
+        data.forEach(item => {
+          if (!formattedResults[item.student_id]) {
+            formattedResults[item.student_id] = {};
+          }
+          
+          formattedResults[item.student_id][item.test_id] = item.score;
+        });
+        
+        setResults(formattedResults);
+        
+        // Для учня також завантажуємо всі результати для порівняння
+        if (userRole === 'student') {
+          const { data: allData, error: allError } = await supabase
+            .from('test_results')
+            .select('*');
+            
+          if (!allError) {
+            const allFormattedResults = {};
+            
+            allData.forEach(item => {
+              if (!allFormattedResults[item.student_id]) {
+                allFormattedResults[item.student_id] = {};
+              }
+              
+              allFormattedResults[item.student_id][item.test_id] = item.score;
+            });
+            
+            setAllResults(allFormattedResults);
+          }
+        }
+      } catch (error) {
+        console.error('Помилка при завантаженні даних:', error);
+      } finally {
+        setLoading(false);
       }
-    }
-  }, [userRole]);
+    };
 
-  // Збереження результатів в localStorage
-  useEffect(() => {
-    localStorage.setItem('testResults', JSON.stringify(results));
-  }, [results]);
+    fetchResults();
+  }, [userRole, studentId]);
 
   // Встановлюємо вибраного учня при першому завантаженні, якщо це учень
   useEffect(() => {
@@ -142,18 +188,36 @@ const StudentDashboard = ({ studentId, userRole }) => {
     return conversionTable[score] || 0;
   };
 
-  // Додавання нового результату
-  const handleAddResult = () => {
+  // Додавання нового результату через Supabase
+  const handleAddResult = async () => {
     if (newResult.studentId && newResult.testId && newResult.score >= 0 && newResult.score <= 32) {
-      setResults(prev => ({
-        ...prev,
-        [newResult.studentId]: {
-          ...(prev[newResult.studentId] || {}),
-          [newResult.testId]: parseInt(newResult.score)
-        }
-      }));
-      setNewResult({ studentId: "", testId: "", score: 0 });
-      setShowAddResult(false);
+      try {
+        // Додаємо/оновлюємо результат через Supabase
+        const { error } = await supabase
+          .from('test_results')
+          .upsert({
+            student_id: newResult.studentId,
+            test_id: newResult.testId,
+            score: parseInt(newResult.score)
+          });
+        
+        if (error) throw error;
+        
+        // Оновлюємо локальний стан для оновлення інтерфейсу без перезавантаження
+        setResults(prev => ({
+          ...prev,
+          [newResult.studentId]: {
+            ...(prev[newResult.studentId] || {}),
+            [newResult.testId]: parseInt(newResult.score)
+          }
+        }));
+        
+        setNewResult({ studentId: "", testId: "", score: 0 });
+        setShowAddResult(false);
+      } catch (error) {
+        console.error('Помилка при збереженні результату:', error);
+        alert('Помилка при збереженні результату: ' + error.message);
+      }
     } else {
       alert("Будь ласка, заповніть всі поля коректно. Кількість балів має бути від 0 до 32.");
     }
@@ -326,6 +390,17 @@ const StudentDashboard = ({ studentId, userRole }) => {
 
   // Фільтрація тестів за вибраною категорією
   const filteredTests = tests.filter(test => test.category === selectedCategory);
+
+  // Відображення індикатора завантаження
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+        <div className="loading-indicator">
+          <p>Завантаження даних...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-container">

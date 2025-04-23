@@ -4,6 +4,7 @@ import LoginPage from './components/LoginPage';
 import DataEntryPage from './components/DataEntryPage';
 import StudentDashboard from './components/StudentDashboard';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
+import { supabase } from './supabase'; // Імпортуйте supabase клієнт
 
 function App() {
   const [auth, setAuth] = useState({
@@ -13,54 +14,101 @@ function App() {
   });
   const [view, setView] = useState('dashboard'); // 'dashboard', 'dataEntry', 'analytics'
 
-  // Перевіряємо, чи користувач вже увійшов в систему
+  // Перевірка сесії при завантаженні
   useEffect(() => {
-    const savedAuth = localStorage.getItem('auth');
-    if (savedAuth) {
-      const parsedAuth = JSON.parse(savedAuth);
-      setAuth(parsedAuth);
+    const checkSession = async () => {
+      // Отримуємо поточну сесію Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session) {
+        // Отримуємо профіль користувача
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+          
+        if (profileData && !profileError) {
+          // Встановлюємо стан авторизації
+          const newAuth = {
+            isLoggedIn: true,
+            role: profileData.role,
+            studentId: profileData.student_id
+          };
+          
+          setAuth(newAuth);
+          
+          // Встановлюємо початковий вид в залежності від ролі
+          if (profileData.role === 'analytics') {
+            setView('analytics');
+          } else if (profileData.role === 'teacher') {
+            setView('dataEntry');
+          } else {
+            setView('dashboard');
+          }
+        }
+      }
+    };
+    
+    checkSession();
+  }, []);
+
+  // Обробка входу користувача
+  const handleLogin = async (userData) => {
+    try {
+      // Авторизація через Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: userData.email,
+        password: userData.password
+      });
+      
+      if (error) throw error;
+      
+      // Отримуємо профіль користувача
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+        
+      if (profileError) throw profileError;
+      
+      // Оновлюємо стан авторизації
+      const newAuth = {
+        isLoggedIn: true,
+        role: profileData.role,
+        studentId: profileData.student_id
+      };
+      
+      setAuth(newAuth);
       
       // Встановлюємо початковий вид в залежності від ролі
-      if (parsedAuth.role === 'analytics') {
+      if (profileData.role === 'analytics') {
         setView('analytics');
-      } else if (parsedAuth.role === 'teacher') {
+      } else if (profileData.role === 'teacher') {
         setView('dataEntry');
       } else {
         setView('dashboard');
       }
-    }
-  }, []);
-
-  // Обробка входу користувача
-  const handleLogin = (userData) => {
-    const newAuth = {
-      isLoggedIn: true,
-      role: userData.role,
-      studentId: userData.studentId || null
-    };
-    
-    setAuth(newAuth);
-    localStorage.setItem('auth', JSON.stringify(newAuth));
-    
-    // Встановлюємо початковий вид в залежності від ролі
-    if (userData.role === 'analytics') {
-      setView('analytics');
-    } else if (userData.role === 'teacher') {
-      setView('dataEntry');
-    } else {
-      setView('dashboard');
+      
+    } catch (error) {
+      console.error('Error logging in:', error.message);
+      alert('Помилка входу: ' + error.message);
     }
   };
 
   // Обробка виходу користувача
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Вихід з Supabase
+    await supabase.auth.signOut();
+    
+    // Очищення стану
     setAuth({
       isLoggedIn: false,
       role: null,
       studentId: null
     });
     setView('dashboard');
-    localStorage.removeItem('auth');
   };
 
   // Вибір, який компонент відображати

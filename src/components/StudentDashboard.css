@@ -411,3 +411,23 @@
 .add-result-buttons button:last-child {
   background-color: #ecf0f1;
 }
+
+/* Додайте цей код для індикатора завантаження в ваш StudentDashboard.css */
+
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  font-size: 18px;
+  color: #3498db;
+  font-weight: bold;
+}
+
+.loading-indicator p {
+  padding: 15px 30px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #3498db;
+}
