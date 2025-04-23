@@ -15,27 +15,39 @@ const LoginPage = ({ onLogin }) => {
     setError('');
     
     try {
+      console.log("Спроба входу:", email);
+      
       // Вхід користувача через Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error("Помилка при авторизації:", error);
+        throw error;
+      }
+
+      console.log("Успішна авторизація:", data);
       
       // Отримуємо профіль користувача з таблиці profiles
       const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-        
-      if (profileError) throw profileError;
+      .from('profiles')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+  
+      if (profileError) {
+        console.error("Помилка отримання профілю:", profileError);
+        throw profileError;
+      }
+
+      console.log("Профіль користувача:", profileData);
       
       // Передаємо дані про користувача в батьківський компонент
       onLogin({
-        email: email,
-        password: password
+        role: profileData.role,
+        studentId: profileData.student_id
       });
       
     } catch (error) {
