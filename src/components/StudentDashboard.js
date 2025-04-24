@@ -4,7 +4,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
-import { supabase } from '../supabase'; // Додайте цей імпорт
+import { supabase } from '../supabase';
 
 const StudentDashboard = ({ studentId, userRole }) => {
   // Дані учнів
@@ -111,7 +111,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
   // Фільтруємо учнів відповідно до ролі
   const displayStudents = userRole === 'student' 
     ? students.filter(s => s.id === studentId)
-    : students;
+    : students;  // Для ролі admin показуємо всіх учнів
 
   // Завантаження збережених результатів з Supabase
   useEffect(() => {
@@ -126,7 +126,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
           query = query.eq('student_id', studentId);
         }
         
-        const { data, error } = await query;
+        const { data, error } = await query; // Отримуємо дані з запиту
         
         if (error) {
           console.error('Помилка при завантаженні даних:', error);
@@ -419,8 +419,8 @@ const StudentDashboard = ({ studentId, userRole }) => {
         </div>
       </header>
 
-      {/* Кнопка додавання результату тільки для адміна/вчителя */}
-      {(userRole === 'admin' || userRole === 'teacher') && (
+      {/* Кнопка додавання результату тільки для адміна */}
+      {userRole === 'admin' && (
         <div className="dashboard-actions">
           <button 
             className="add-result-btn"
@@ -483,7 +483,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
         </div>
       )}
 
-      <div className="results-table-container">
+<div className="results-table-container">
         <table className="results-table">
           <thead>
             <tr>
@@ -583,24 +583,6 @@ const StudentDashboard = ({ studentId, userRole }) => {
             </div>
             
             <div className="chart-container">
-              <h3>Порівняння з середнім по класу</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart 
-                  data={getComparisonData(selectedStudent)}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                  <YAxis domain={[0, 200]} />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="Ваш бал" fill="#3498db" />
-                  <Bar dataKey="Середній бал класу" fill="#e74c3c" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            
-            <div className="chart-container">
               <h3>Розподіл ваших балів</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -649,7 +631,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
         </div>
       )}
 
-      {selectedStudent && userRole !== 'student' && (
+{selectedStudent && userRole !== 'student' && (
         <div className="student-details">
           <h2>{students.find(s => s.id === selectedStudent)?.name}</h2>
           <div className="student-stats">

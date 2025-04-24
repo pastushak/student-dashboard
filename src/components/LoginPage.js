@@ -14,8 +14,25 @@ const LoginPage = ({ onLogin }) => {
     setLoading(true);
     setError('');
     
+    // Перевірка значень перед відправкою
+    if (!email || email.trim() === '') {
+      setError('Email є обов\'язковим');
+      setLoading(false);
+      return;
+    }
+    
+    // Перевірка підключення до інтернету
+    if (!navigator.onLine) {
+      setError('Немає з\'єднання з інтернетом. Перевірте підключення і спробуйте знову.');
+      setLoading(false);
+      return;
+    }
+    
     try {
       console.log("Спроба входу:", email);
+      
+      // Додайте цей рядок для детальнішого логування
+      console.log("Дані для відправки:", { email, password: '****' });
       
       // Вхід користувача через Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -44,9 +61,15 @@ const LoginPage = ({ onLogin }) => {
 
       console.log("Профіль користувача:", profileData);
       
+      // Трансформація ролі - всі адміністративні ролі конвертуються в "admin"
+      let role = profileData.role;
+      if (role === 'teacher' || role === 'analytics') {
+        role = 'admin';
+      }
+      
       // Передаємо дані про користувача в батьківський компонент
       onLogin({
-        role: profileData.role,
+        role: profileData.role, // Передаємо оригінальну роль
         studentId: profileData.student_id
       });
       
@@ -77,6 +100,7 @@ const LoginPage = ({ onLogin }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email" // Змінено
             />
           </div>
           
@@ -88,6 +112,7 @@ const LoginPage = ({ onLogin }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password" // Змінено
             />
           </div>
           
