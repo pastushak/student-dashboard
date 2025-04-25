@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './DataEntryPage.css';
+import { supabase } from '../supabase';
 
 const DataEntryPage = ({ onLogout }) => {
   // Дані учнів
@@ -94,28 +95,54 @@ const DataEntryPage = ({ onLogout }) => {
   const [selectedCategory, setSelectedCategory] = useState("own");
   const [selectedTest, setSelectedTest] = useState("");
   const [showConversion, setShowConversion] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saveStatus, setSaveStatus] = useState({ show: false, message: "", isError: false });
 
-  // Завантаження збережених результатів
+  // Завантаження результатів з Supabase при ініціалізації
   useEffect(() => {
-    const savedResults = localStorage.getItem('testResults');
-    if (savedResults) {
-      setResults(JSON.parse(savedResults));
-    }
+    const fetchResults = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('test_results')
+          .select('*');
+        
+        if (error) {
+          console.error('Помилка при завантаженні даних:', error);
+          return;
+        }
+        
+        // Перетворюємо результати у потрібний формат
+        const formattedResults = {};
+        
+        data.forEach(item => {
+          if (!formattedResults[item.student_id]) {
+            formattedResults[item.student_id] = {};
+          }
+          
+          formattedResults[item.student_id][item.test_id] = item.score;
+        });
+        
+        setResults(formattedResults);
+      } catch (error) {
+        console.error('Помилка при завантаженні даних:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResults();
   }, []);
-
-  // Збереження результатів в localStorage
-  useEffect(() => {
-    localStorage.setItem('testResults', JSON.stringify(results));
-  }, [results]);
 
   // Конвертація тестового балу в бал за шкалою 100-200
   const convertScore = (score) => {
     return conversionTable[score] || 0;
   };
 
-  // Оновлення результату для учня
-  const handleScoreChange = (studentId, score) => {
+  // Оновлення результату для учня та збереження в Supabase
+  const handleScoreChange = async (studentId, score) => {
     if (selectedTest && score >= 0 && score <= 32) {
+      // Оновлюємо локальний стан для миттєвого відображення
       setResults(prev => ({
         ...prev,
         [studentId]: {
@@ -123,11 +150,60 @@ const DataEntryPage = ({ onLogout }) => {
           [selectedTest]: parseInt(score)
         }
       }));
+
+      try {
+        // Зберігаємо/оновлюємо в Supabase
+        const { error } = await supabase
+          .from('test_results')
+          .upsert({
+            student_id: studentId,
+            test_id: selectedTest,
+            score: parseInt(score)
+          });
+        
+        if (error) throw error;
+        
+        // Показуємо повідомлення про успішне збереження
+        setSaveStatus({
+          show: true,
+          message: "Результат збережено",
+          isError: false
+        });
+        
+        // Ховаємо повідомлення через 3 секунди
+        setTimeout(() => {
+          setSaveStatus({ show: false, message: "", isError: false });
+        }, 3000);
+      } catch (error) {
+        console.error('Помилка при збереженні результату:', error);
+        
+        // Показуємо повідомлення про помилку
+        setSaveStatus({
+          show: true,
+          message: `Помилка: ${error.message}`,
+          isError: true
+        });
+        
+        // Ховаємо повідомлення через 5 секунд
+        setTimeout(() => {
+          setSaveStatus({ show: false, message: "", isError: false });
+        }, 5000);
+      }
     }
   };
 
   // Фільтрація тестів за вибраною категорією
   const filteredTests = tests.filter(test => test.category === selectedCategory);
+
+  if (loading) {
+    return (
+      <div className="data-entry-container">
+        <div className="loading-indicator">
+          <p>Завантаження даних...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="data-entry-container">
@@ -173,6 +249,13 @@ const DataEntryPage = ({ onLogout }) => {
           {showConversion ? "Сховати таблицю" : "Показати таблицю переведення"}
         </button>
       </div>
+
+      {/* Повідомлення про статус збереження */}
+      {saveStatus.show && (
+        <div className={`save-status ${saveStatus.isError ? 'error' : 'success'}`}>
+          {saveStatus.message}
+        </div>
+      )}
 
       {showConversion && (
         <div className="conversion-table-container">
