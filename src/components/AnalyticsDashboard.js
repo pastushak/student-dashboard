@@ -5,6 +5,7 @@ import {
   Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, 
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis 
 } from 'recharts';
+import { supabase } from '../supabase';
 
 const AnalyticsDashboard = ({ userRole }) => {
   // Дані учнів
@@ -102,13 +103,42 @@ const AnalyticsDashboard = ({ userRole }) => {
   const [showAllStudents, setShowAllStudents] = useState(true);
   const [timeRange, setTimeRange] = useState("all"); // all, last3, last5
   const [topStudentsCount, setTopStudentsCount] = useState(5);
+  const [loading, setLoading] = useState(true);
 
-  // Завантаження збережених результатів
+  // Завантаження результатів з Supabase
   useEffect(() => {
-    const savedResults = localStorage.getItem('testResults');
-    if (savedResults) {
-      setResults(JSON.parse(savedResults));
-    }
+    const fetchResults = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('test_results')
+          .select('*');
+        
+        if (error) {
+          console.error('Помилка при завантаженні даних:', error);
+          return;
+        }
+        
+        // Перетворюємо результати у потрібний формат
+        const formattedResults = {};
+        
+        data.forEach(item => {
+          if (!formattedResults[item.student_id]) {
+            formattedResults[item.student_id] = {};
+          }
+          
+          formattedResults[item.student_id][item.test_id] = item.score;
+        });
+        
+        setResults(formattedResults);
+      } catch (error) {
+        console.error('Помилка при завантаженні даних:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchResults();
   }, []);
 
   // Конвертація тестового балу в бал за шкалою 100-200
@@ -502,6 +532,17 @@ const AnalyticsDashboard = ({ userRole }) => {
         return <div>Виберіть тип графіка для відображення</div>;
     }
   };
+
+  // Відображення індикатора завантаження
+  if (loading) {
+    return (
+      <div className="analytics-container">
+        <div className="loading-indicator">
+          <p>Завантаження даних...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="analytics-container">

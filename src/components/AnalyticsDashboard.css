@@ -262,3 +262,53 @@
     border-radius: 4px;
     display: inline-block;
   }
+
+/* Додамо стилі для індикатора завантаження */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Анімація завантаження */
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+.loading-indicator p {
+  animation: pulse 1.5s infinite;
+  padding: 15px 30px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Покращимо стилі для карток */
+.overview-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.overview-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Стилі для карток тенденцій */
+.trend-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.trend-card:hover {
+  transform: scale(1.05);
+}
