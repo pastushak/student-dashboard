@@ -199,6 +199,9 @@ const StudentDashboard = ({ studentId, userRole }) => {
             student_id: newResult.studentId,
             test_id: newResult.testId,
             score: parseInt(newResult.score)
+          }, { 
+            onConflict: 'student_id,test_id',
+            ignoreDuplicates: false
           });
         
         if (error) throw error;

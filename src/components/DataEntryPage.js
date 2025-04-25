@@ -160,32 +160,36 @@ const DataEntryPage = ({ onLogout }) => {
   };
   
   // Збереження всіх результатів для обраного тесту в Supabase
-  const saveResults = async () => {
-    if (!selectedTest || !unsavedChanges) return;
+  // Зберігання всіх результатів для обраного тесту в Supabase
+const saveResults = async () => {
+  if (!selectedTest || !unsavedChanges) return;
+  
+  try {
+    setLoading(true);
     
-    try {
-      setLoading(true);
-      
-      // Підготовка даних для пакетного завантаження
-      const updatesArray = [];
-      
-      // Перебираємо всіх студентів і додаємо їхні результати для вибраного тесту
-      students.forEach(student => {
-        if (results[student.id] && results[student.id][selectedTest] !== undefined) {
-          updatesArray.push({
-            student_id: student.id,
-            test_id: selectedTest,
-            score: results[student.id][selectedTest]
-          });
-        }
+    // Підготовка даних для пакетного завантаження
+    const updatesArray = [];
+    
+    // Перебираємо всіх студентів і додаємо їхні результати для вибраного тесту
+    students.forEach(student => {
+      if (results[student.id] && results[student.id][selectedTest] !== undefined) {
+        updatesArray.push({
+          student_id: student.id,
+          test_id: selectedTest,
+          score: results[student.id][selectedTest]
+        });
+      }
+    });
+    
+    // Зберігаємо/оновлюємо в Supabase (пакетна операція)
+    const { error } = await supabase
+      .from('test_results')
+      .upsert(updatesArray, { 
+        onConflict: 'student_id,test_id', // Вказуємо, що робити в разі конфлікту
+        ignoreDuplicates: false // Не ігноруємо дублікати, а оновлюємо їх
       });
-      
-      // Зберігаємо/оновлюємо в Supabase (пакетна операція)
-      const { error } = await supabase
-        .from('test_results')
-        .upsert(updatesArray);
-      
-      if (error) throw error;
+    
+    if (error) throw error;
       
       // Скидаємо прапорець незбережених змін
       setUnsavedChanges(false);
