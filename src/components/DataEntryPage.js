@@ -139,8 +139,11 @@ const DataEntryPage = ({ onLogout }) => {
     return conversionTable[score] || 0;
   };
 
-  // Оновлення результату для учня та збереження в Supabase
-  const handleScoreChange = async (studentId, score) => {
+  // Стан для відстеження змінених результатів, які ще не збережені
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  
+  // Оновлення результату учня (тільки в локальному стані)
+  const handleScoreChange = (studentId, score) => {
     if (selectedTest && score >= 0 && score <= 32) {
       // Оновлюємо локальний стан для миттєвого відображення
       setResults(prev => ({
@@ -150,45 +153,70 @@ const DataEntryPage = ({ onLogout }) => {
           [selectedTest]: parseInt(score)
         }
       }));
-
-      try {
-        // Зберігаємо/оновлюємо в Supabase
-        const { error } = await supabase
-          .from('test_results')
-          .upsert({
-            student_id: studentId,
+      
+      // Встановлюємо прапорець незбережених змін
+      setUnsavedChanges(true);
+    }
+  };
+  
+  // Збереження всіх результатів для обраного тесту в Supabase
+  const saveResults = async () => {
+    if (!selectedTest || !unsavedChanges) return;
+    
+    try {
+      setLoading(true);
+      
+      // Підготовка даних для пакетного завантаження
+      const updatesArray = [];
+      
+      // Перебираємо всіх студентів і додаємо їхні результати для вибраного тесту
+      students.forEach(student => {
+        if (results[student.id] && results[student.id][selectedTest] !== undefined) {
+          updatesArray.push({
+            student_id: student.id,
             test_id: selectedTest,
-            score: parseInt(score)
+            score: results[student.id][selectedTest]
           });
-        
-        if (error) throw error;
-        
-        // Показуємо повідомлення про успішне збереження
-        setSaveStatus({
-          show: true,
-          message: "Результат збережено",
-          isError: false
-        });
-        
-        // Ховаємо повідомлення через 3 секунди
-        setTimeout(() => {
-          setSaveStatus({ show: false, message: "", isError: false });
-        }, 3000);
-      } catch (error) {
-        console.error('Помилка при збереженні результату:', error);
-        
-        // Показуємо повідомлення про помилку
-        setSaveStatus({
-          show: true,
-          message: `Помилка: ${error.message}`,
-          isError: true
-        });
-        
-        // Ховаємо повідомлення через 5 секунд
-        setTimeout(() => {
-          setSaveStatus({ show: false, message: "", isError: false });
-        }, 5000);
-      }
+        }
+      });
+      
+      // Зберігаємо/оновлюємо в Supabase (пакетна операція)
+      const { error } = await supabase
+        .from('test_results')
+        .upsert(updatesArray);
+      
+      if (error) throw error;
+      
+      // Скидаємо прапорець незбережених змін
+      setUnsavedChanges(false);
+      
+      // Показуємо повідомлення про успішне збереження
+      setSaveStatus({
+        show: true,
+        message: "Всі результати збережено",
+        isError: false
+      });
+      
+      // Ховаємо повідомлення через 3 секунди
+      setTimeout(() => {
+        setSaveStatus({ show: false, message: "", isError: false });
+      }, 3000);
+    } catch (error) {
+      console.error('Помилка при збереженні результатів:', error);
+      
+      // Показуємо повідомлення про помилку
+      setSaveStatus({
+        show: true,
+        message: `Помилка: ${error.message}`,
+        isError: true
+      });
+      
+      // Ховаємо повідомлення через 5 секунд
+      setTimeout(() => {
+        setSaveStatus({ show: false, message: "", isError: false });
+      }, 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -321,6 +349,20 @@ const DataEntryPage = ({ onLogout }) => {
               })}
             </tbody>
           </table>
+          
+          {/* Кнопка збереження результатів */}
+          <div className="save-results-container">
+            <button 
+              className={`save-results-btn ${unsavedChanges ? 'unsaved' : ''}`}
+              onClick={saveResults}
+              disabled={!unsavedChanges || loading}
+            >
+              {loading ? 'Збереження...' : 'Зберегти результати'}
+            </button>
+            {unsavedChanges && (
+              <span className="unsaved-message">* Є незбережені зміни</span>
+            )}
+          </div>
         </div>
       ) : (
         <div className="no-test-selected">
