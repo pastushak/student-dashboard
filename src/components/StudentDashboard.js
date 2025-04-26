@@ -7,7 +7,6 @@ import {
   Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 import { supabase } from '../supabase';
-import ResponsiveResultsTable from './ResponsiveResultsTable'; // Імпортуємо новий компонент
 
 const StudentDashboard = ({ studentId, userRole }) => {
   // Дані учнів
@@ -109,8 +108,8 @@ const StudentDashboard = ({ studentId, userRole }) => {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [allResults, setAllResults] = useState({});
   const [loading, setLoading] = useState(true);
-  // Новий стан для режиму перегляду на мобільних
-  const [viewMode, setViewMode] = useState('table'); // 'table' або 'cards'
+  // Стан для відстеження розгорнутих карток
+  const [expandedCards, setExpandedCards] = useState({});
 
   // Фільтруємо учнів відповідно до ролі
   const displayStudents = userRole === 'student' 
@@ -189,27 +188,6 @@ const StudentDashboard = ({ studentId, userRole }) => {
     }
   }, [userRole, studentId]);
 
-  // Визначення режиму відображення на основі розміру екрану
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 480) {
-        setViewMode('cards');
-      } else {
-        setViewMode('table');
-      }
-    };
-
-    // Початкове визначення режиму
-    handleResize();
-
-    // Додаємо обробник події при зміні розміру
-    window.addEventListener('resize', handleResize);
-
-    // Очищаємо обробник при відмонтуванні компонента
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
   // Конвертація тестового балу в бал за шкалою 100-200
   const convertScore = (score) => {
     return conversionTable[score] || 0;
@@ -316,7 +294,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
     return categoryTests
       .filter(test => studentResults[test.id] !== undefined)
       .map(test => ({
-        name: test.category === 'own' ? `Варіант ${test.name}` : `Тест ${test.name}`,
+        name: test.category === 'own' ? `${test.name}` : `${test.name}`,
         score: convertScore(studentResults[test.id])
       }));
   };
@@ -349,7 +327,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
         const classAverage = count > 0 ? totalClassScore / count : 0;
         
         return {
-          name: test.category === 'own' ? `Варіант ${test.name}` : `Тест ${test.name}`,
+          name: test.category === 'own' ? `${test.name}` : `${test.name}`,
           'Ваш бал': convertScore(studentResults[test.id]),
           'Середній бал класу': parseFloat(classAverage.toFixed(2))
         };
@@ -413,15 +391,27 @@ const StudentDashboard = ({ studentId, userRole }) => {
     if (lastScore < firstScore) return "down";
     return "neutral";
   };
-  // Створення карток для мобільного перегляду
+  // Створення карток для відображення
   const renderStudentCards = () => {
     // Фільтруємо тести за вибраною категорією
     const filteredTests = tests.filter(test => test.category === selectedCategory);
+        
+    // Функція для перемикання розгорнутого стану картки
+    const toggleCardExpand = (studentId) => {
+      setExpandedCards(prev => ({
+        ...prev,
+        [studentId]: !prev[studentId]
+      }));
+    };
     
     return (
       <div className="results-cards">
         {displayStudents.map(student => {
           const studentAvg = getStudentAverage(student.id, selectedCategory);
+          const isExpanded = expandedCards[student.id] || false;
+          
+          // Визначаємо скільки тестів показувати
+          const testsToShow = isExpanded ? filteredTests : filteredTests.slice(0, 5);
           
           return (
             <div 
@@ -437,7 +427,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
               </div>
               
               <div className="student-card-results">
-                {filteredTests.slice(0, 6).map(test => {
+                {testsToShow.map(test => {
                   const rawScore = getTestResult(student.id, test.id);
                   const convertedScore = getConvertedTestResult(student.id, test.id);
                   
@@ -451,9 +441,17 @@ const StudentDashboard = ({ studentId, userRole }) => {
                 })}
               </div>
               
-              {filteredTests.length > 6 && (
+              {filteredTests.length > 5 && (
                 <div className="show-more-results">
-                  <button className="show-more-btn">Показати більше...</button>
+                  <button 
+                    className="show-more-btn"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Зупиняємо подію кліка, щоб вона не впливала на вибір студента
+                      toggleCardExpand(student.id);
+                    }}
+                  >
+                    {isExpanded ? "Показати менше" : "Показати більше..."}
+                  </button>
                 </div>
               )}
             </div>
@@ -517,22 +515,6 @@ const StudentDashboard = ({ studentId, userRole }) => {
         </div>
       )}
 
-      {/* Перемикач режиму перегляду для адаптивного інтерфейсу */}
-      <div className="view-mode-toggle">
-        <button 
-          className={`view-mode-btn ${viewMode === 'table' ? 'active' : ''}`}
-          onClick={() => setViewMode('table')}
-        >
-          <span className="view-mode-icon">⊞</span> Таблиця
-        </button>
-        <button 
-          className={`view-mode-btn ${viewMode === 'cards' ? 'active' : ''}`}
-          onClick={() => setViewMode('cards')}
-        >
-          <span className="view-mode-icon">☰</span> Картки
-        </button>
-      </div>
-
       {showAddResult && (
         <div className="add-result-modal">
           <div className="add-result-content">
@@ -573,23 +555,8 @@ const StudentDashboard = ({ studentId, userRole }) => {
         </div>
       )}
 
-      {/* Відображення таблиці або карток в залежності від режиму */}
-      {viewMode === 'table' ? (
-        <ResponsiveResultsTable
-          students={displayStudents}
-          tests={filteredTests}
-          results={results}
-          getTestResult={getTestResult}
-          getConvertedTestResult={getConvertedTestResult}
-          getStudentAverage={getStudentAverage}
-          selectedStudent={selectedStudent}
-          setSelectedStudent={setSelectedStudent}
-          userRole={userRole}
-          selectedCategory={selectedCategory}
-        />
-      ) : (
-        renderStudentCards()
-      )}
+      {/* Відображення результатів у вигляді карток */}
+      {renderStudentCards()}
   {/* Розширена аналітика для учня */}
   {userRole === 'student' && showAnalytics && selectedStudent && (
     <div className="student-analytics">
@@ -640,7 +607,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
               margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+              <XAxis dataKey="name" angle={0} textAnchor="end" height={50} />
               <YAxis domain={[0, 200]} />
               <Tooltip formatter={(value) => [`${value}`, 'Бал']} />
               <Line 
@@ -686,7 +653,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
               margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+              <XAxis dataKey="name" angle={0} textAnchor="end" height={50} />
               <YAxis domain={[0, 200]} />
               <Tooltip />
               <Legend />
