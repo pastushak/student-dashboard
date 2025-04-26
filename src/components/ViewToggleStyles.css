@@ -1,0 +1,232 @@
+  /* ===== ViewToggleStyles.css ===== */
+  
+  /* Стилі для перемикача режиму перегляду */
+  .view-mode-toggle {
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+    gap: 10px;
+  }
+  
+  .view-mode-btn {
+    padding: 8px 16px;
+    background-color: #f0f2f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+  }
+  
+  .view-mode-btn:hover {
+    background-color: #e4e7eb;
+  }
+  
+  .view-mode-btn.active {
+    background-color: #3498db;
+    color: white;
+    border-color: #2980b9;
+  }
+  
+  .view-mode-icon {
+    font-size: 16px;
+  }
+  
+  /* Стилі для карткового перегляду */
+  .results-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  
+  .student-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .student-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+  
+  .student-card.selected-student {
+    border-left: 4px solid #3498db;
+  }
+  
+  .student-card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .student-card-name {
+    font-weight: bold;
+    font-size: 16px;
+    color: #2c3e50;
+  }
+  
+  .student-card-average {
+    font-weight: bold;
+    color: #3498db;
+    font-size: 18px;
+  }
+  
+  .student-card-results {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .test-result-item {
+    background-color: #f9f9f9;
+    padding: 8px;
+    border-radius: 6px;
+    text-align: center;
+    transition: background-color 0.2s;
+  }
+  
+  .test-result-item:hover {
+    background-color: #f0f2f5;
+  }
+  
+  .test-result-name {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+  }
+  
+  .test-result-score {
+    font-size: 16px;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+  
+  .test-result-converted {
+    font-size: 11px;
+    color: #3498db;
+    margin-top: 2px;
+  }
+  
+  .show-more-results {
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .show-more-btn {
+    padding: 6px 12px;
+    background-color: transparent;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #3498db;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .show-more-btn:hover {
+    background-color: #f0f2f5;
+    border-color: #3498db;
+  }
+  
+  /* Покращене відображення деталей учня */
+  .student-details {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+  }
+  
+  .student-details h2 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 20px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .student-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .student-stats p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .student-progress-chart {
+    margin-top: 20px;
+  }
+  
+  .student-progress-chart h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  /* Медіа-запити для адаптивності */
+  @media (max-width: 768px) {
+    .view-mode-toggle {
+      flex-wrap: wrap;
+    }
+    
+    .student-card-results {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .student-stats {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .view-mode-toggle {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .student-card-header {
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .student-card-average {
+      align-self: flex-start;
+    }
+    
+    .student-card-results {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .test-result-item {
+      padding: 6px;
+    }
+    
+    .test-result-name {
+      font-size: 10px;
+    }
+    
+    .test-result-score {
+      font-size: 14px;
+    }
+    
+    .test-result-converted {
+      font-size: 9px;
+    }
+  }

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './StudentDashboard.css';
+import './ResponsiveResultsTable.css'; // Додаємо нові стилі
+import './ViewToggleStyles.css'; // Додаємо стилі для режимів перегляду
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell
 } from 'recharts';
 import { supabase } from '../supabase';
+import ResponsiveResultsTable from './ResponsiveResultsTable'; // Імпортуємо новий компонент
 
 const StudentDashboard = ({ studentId, userRole }) => {
   // Дані учнів
@@ -93,8 +96,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
     25: 170, 26: 173, 27: 176, 28: 180, 29: 184,
     30: 189, 31: 194, 32: 200
   };
-
-  // Стан для зберігання результатів
+  // Стани компонента
   const [results, setResults] = useState({});
   const [selectedCategory, setSelectedCategory] = useState("own");
   const [selectedStudent, setSelectedStudent] = useState(studentId || null);
@@ -106,13 +108,17 @@ const StudentDashboard = ({ studentId, userRole }) => {
   });
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [allResults, setAllResults] = useState({});
-  const [loading, setLoading] = useState(true); // Додаємо індикатор завантаження
+  const [loading, setLoading] = useState(true);
+  // Новий стан для режиму перегляду на мобільних
+  const [viewMode, setViewMode] = useState('table'); // 'table' або 'cards'
 
   // Фільтруємо учнів відповідно до ролі
   const displayStudents = userRole === 'student' 
     ? students.filter(s => s.id === studentId)
     : students;  // Для ролі admin показуємо всіх учнів
 
+  // Кольори для графіків
+  const COLORS = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6'];
   // Завантаження збережених результатів з Supabase
   useEffect(() => {
     const fetchResults = async () => {
@@ -183,6 +189,27 @@ const StudentDashboard = ({ studentId, userRole }) => {
     }
   }, [userRole, studentId]);
 
+  // Визначення режиму відображення на основі розміру екрану
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 480) {
+        setViewMode('cards');
+      } else {
+        setViewMode('table');
+      }
+    };
+
+    // Початкове визначення режиму
+    handleResize();
+
+    // Додаємо обробник події при зміні розміру
+    window.addEventListener('resize', handleResize);
+
+    // Очищаємо обробник при відмонтуванні компонента
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   // Конвертація тестового балу в бал за шкалою 100-200
   const convertScore = (score) => {
     return conversionTable[score] || 0;
@@ -256,7 +283,6 @@ const StudentDashboard = ({ studentId, userRole }) => {
     const rawScore = getTestResult(studentId, testId);
     return rawScore !== "-" ? convertScore(rawScore) : "-";
   };
-
   // Отримання рейтингу учня відносно інших
   const getStudentRank = (studentId, category) => {
     const studentAvg = parseFloat(getStudentAverage(studentId, category));
@@ -325,7 +351,7 @@ const StudentDashboard = ({ studentId, userRole }) => {
         return {
           name: test.category === 'own' ? `Варіант ${test.name}` : `Тест ${test.name}`,
           'Ваш бал': convertScore(studentResults[test.id]),
-          'Середній бал класу': classAverage.toFixed(2)
+          'Середній бал класу': parseFloat(classAverage.toFixed(2))
         };
       });
   };
@@ -387,12 +413,55 @@ const StudentDashboard = ({ studentId, userRole }) => {
     if (lastScore < firstScore) return "down";
     return "neutral";
   };
-
-  // Кольори для графіків
-  const COLORS = ['#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6'];
-
-  // Фільтрація тестів за вибраною категорією
-  const filteredTests = tests.filter(test => test.category === selectedCategory);
+  // Створення карток для мобільного перегляду
+  const renderStudentCards = () => {
+    // Фільтруємо тести за вибраною категорією
+    const filteredTests = tests.filter(test => test.category === selectedCategory);
+    
+    return (
+      <div className="results-cards">
+        {displayStudents.map(student => {
+          const studentAvg = getStudentAverage(student.id, selectedCategory);
+          
+          return (
+            <div 
+              key={student.id} 
+              className={`student-card ${selectedStudent === student.id ? "selected-student" : ""}`}
+              onClick={() => userRole !== 'student' && setSelectedStudent(student.id)}
+            >
+              <div className="student-card-header">
+                <div className="student-card-name">{student.name}</div>
+                <div className="student-card-average">
+                  {studentAvg !== "-" ? studentAvg : "-"}
+                </div>
+              </div>
+              
+              <div className="student-card-results">
+                {filteredTests.slice(0, 6).map(test => {
+                  const rawScore = getTestResult(student.id, test.id);
+                  const convertedScore = getConvertedTestResult(student.id, test.id);
+                  
+                  return (
+                    <div key={test.id} className="test-result-item">
+                      <div className="test-result-name">{test.name}</div>
+                      <div className="test-result-score">{rawScore}</div>
+                      <div className="test-result-converted">{convertedScore}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {filteredTests.length > 6 && (
+                <div className="show-more-results">
+                  <button className="show-more-btn">Показати більше...</button>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   // Відображення індикатора завантаження
   if (loading) {
@@ -405,6 +474,8 @@ const StudentDashboard = ({ studentId, userRole }) => {
     );
   }
 
+  // Фільтруємо тести за вибраною категорією
+  const filteredTests = tests.filter(test => test.category === selectedCategory);
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -446,6 +517,22 @@ const StudentDashboard = ({ studentId, userRole }) => {
         </div>
       )}
 
+      {/* Перемикач режиму перегляду для адаптивного інтерфейсу */}
+      <div className="view-mode-toggle">
+        <button 
+          className={`view-mode-btn ${viewMode === 'table' ? 'active' : ''}`}
+          onClick={() => setViewMode('table')}
+        >
+          <span className="view-mode-icon">⊞</span> Таблиця
+        </button>
+        <button 
+          className={`view-mode-btn ${viewMode === 'cards' ? 'active' : ''}`}
+          onClick={() => setViewMode('cards')}
+        >
+          <span className="view-mode-icon">☰</span> Картки
+        </button>
+      </div>
+
       {showAddResult && (
         <div className="add-result-modal">
           <div className="add-result-content">
@@ -486,165 +573,196 @@ const StudentDashboard = ({ studentId, userRole }) => {
         </div>
       )}
 
-<div className="results-table-container">
-        <table className="results-table">
-          <thead>
-            <tr>
-              <th className="student-name-cell">Учень</th>
-              {filteredTests.map(test => (
-                <th key={test.id} className="test-result-cell">
-                  {test.name}
-                </th>
-              ))}
-              <th className="average-cell">Середній бал</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayStudents.map(student => (
-              <tr key={student.id} 
-                  className={selectedStudent === student.id ? "selected-student" : ""}
-                  onClick={() => userRole !== 'student' && setSelectedStudent(student.id)}
-              >
-                <td className="student-name-cell">{student.name}</td>
-                {filteredTests.map(test => (
-                  <td key={test.id} className="test-result-cell">
-                    <div className="result-wrapper">
-                      <span className="raw-score">{getTestResult(student.id, test.id)}</span>
-                      <span className="converted-score">{getConvertedTestResult(student.id, test.id)}</span>
-                    </div>
-                  </td>
-                ))}
-                <td className="average-cell">{getStudentAverage(student.id, selectedCategory)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Відображення таблиці або карток в залежності від режиму */}
+      {viewMode === 'table' ? (
+        <ResponsiveResultsTable
+          students={displayStudents}
+          tests={filteredTests}
+          results={results}
+          getTestResult={getTestResult}
+          getConvertedTestResult={getConvertedTestResult}
+          getStudentAverage={getStudentAverage}
+          selectedStudent={selectedStudent}
+          setSelectedStudent={setSelectedStudent}
+          userRole={userRole}
+          selectedCategory={selectedCategory}
+        />
+      ) : (
+        renderStudentCards()
+      )}
+  {/* Розширена аналітика для учня */}
+  {userRole === 'student' && showAnalytics && selectedStudent && (
+    <div className="student-analytics">
+      <h2>Ваша аналітика</h2>
+      
+      <div className="analytics-overview">
+        <div className="overview-card">
+          <h3>Загальна статистика</h3>
+          <div className="stats-grid">
+            <div className="stat-item">
+              <span className="stat-label">Середній бал (вхідні)</span>
+              <span className="stat-value">{getStudentAverage(selectedStudent, "own")}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Середній бал (тренувальні)</span>
+              <span className="stat-value">{getStudentAverage(selectedStudent, "training")}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Місце у рейтингу (вхідні)</span>
+              <span className="stat-value">{getStudentRank(selectedStudent, "own")}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Місце у рейтингу (тренувальні)</span>
+              <span className="stat-value">{getStudentRank(selectedStudent, "training")}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div className="overview-card trend-card">
+          <h3>Ваш прогрес</h3>
+          <div className="trend-info">
+            <span className="trend-label">Тенденція:</span>
+            <span className={`trend-value ${getStudentTrend(selectedStudent)}`}>
+              {getStudentTrend(selectedStudent) === "up" && "Зростання ↑"}
+              {getStudentTrend(selectedStudent) === "down" && "Спадання ↓"}
+              {getStudentTrend(selectedStudent) === "neutral" && "Стабільно →"}
+            </span>
+          </div>
+        </div>
       </div>
-
-      {/* Розширена аналітика для учня */}
-      {userRole === 'student' && showAnalytics && selectedStudent && (
-        <div className="student-analytics">
-          <h2>Ваша аналітика</h2>
-          
-          <div className="analytics-overview">
-            <div className="overview-card">
-              <h3>Загальна статистика</h3>
-              <div className="stats-grid">
-                <div className="stat-item">
-                  <span className="stat-label">Середній бал (вхідні)</span>
-                  <span className="stat-value">{getStudentAverage(selectedStudent, "own")}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Середній бал (тренувальні)</span>
-                  <span className="stat-value">{getStudentAverage(selectedStudent, "training")}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Місце у рейтингу (вхідні)</span>
-                  <span className="stat-value">{getStudentRank(selectedStudent, "own")}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Місце у рейтингу (тренувальні)</span>
-                  <span className="stat-value">{getStudentRank(selectedStudent, "training")}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="overview-card trend-card">
-              <h3>Ваш прогрес</h3>
-              <div className="trend-info">
-                <span className="trend-label">Тенденція:</span>
-                <span className={`trend-value ${getStudentTrend(selectedStudent)}`}>
-                  {getStudentTrend(selectedStudent) === "up" && "Зростання ↑"}
-                  {getStudentTrend(selectedStudent) === "down" && "Спадання ↓"}
-                  {getStudentTrend(selectedStudent) === "neutral" && "Стабільно →"}
-                </span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="analytics-charts">
-            <div className="chart-container">
-              <h3>Ваш прогрес</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart 
-                  data={getStudentProgress(selectedStudent)}
-                  margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
-                  <YAxis domain={[0, 200]} />
-                  <Tooltip formatter={(value) => [`${value}`, 'Бал']} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="score" 
-                    stroke="#3498db" 
-                    activeDot={{ r: 8 }} 
-                    name="Бал" 
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            
-            <div className="chart-container">
-              <h3>Розподіл ваших балів</h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={getScoreDistribution(selectedStudent)}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={true}
-                    label={({ name, percent }) => percent > 0 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="count"
-                    nameKey="range"
-                  >
-                    {getScoreDistribution(selectedStudent).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value, name, props) => [value > 0 ? value : 0, 'Кількість тестів']} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-          
-          <div className="analytics-recommendations">
-            <h3>Рекомендації для покращення</h3>
-            <div className="recommendations-content">
-              {getStudentTrend(selectedStudent) === "up" && (
-                <p>Ваші результати демонструють позитивну динаміку. Продовжуйте в тому ж темпі та зосередьтеся на підтримці високого рівня.</p>
-              )}
-              {getStudentTrend(selectedStudent) === "down" && (
-                <p>Ваші результати демонструють тенденцію до зниження. Рекомендуємо переглянути стратегію підготовки та приділити більше уваги проблемним темам.</p>
-              )}
-              {getStudentTrend(selectedStudent) === "neutral" && (
-                <p>Ваші результати стабільні. Для підвищення ефективності рекомендуємо урізноманітнити підхід до вивчення матеріалу.</p>
-              )}
-              <p>Для досягнення кращих результатів:</p>
-              <ul>
-                <li>Регулярно практикуйтеся, розв'язуючи тренувальні тести</li>
-                <li>Аналізуйте свої помилки та працюйте над їх виправленням</li>
-                <li>Зосередьтеся на темах, які викликають найбільше труднощів</li>
-                <li>Встановіть чіткий графік підготовки та дотримуйтесь його</li>
-              </ul>
-            </div>
-          </div>
+      
+      <div className="analytics-charts">
+        <div className="chart-container">
+          <h3>Ваш прогрес</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart 
+              data={getStudentProgress(selectedStudent)}
+              margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+              <YAxis domain={[0, 200]} />
+              <Tooltip formatter={(value) => [`${value}`, 'Бал']} />
+              <Line 
+                type="monotone" 
+                dataKey="score" 
+                stroke="#3498db" 
+                activeDot={{ r: 8 }} 
+                name="Бал" 
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
-      )}
-
-{selectedStudent && userRole !== 'student' && (
-        <div className="student-details">
-          <h2>{students.find(s => s.id === selectedStudent)?.name}</h2>
-          <div className="student-stats">
-            <p>Середній бал (вхідні): {getStudentAverage(selectedStudent, "own")}</p>
-            <p>Середній бал (тренувальні): {getStudentAverage(selectedStudent, "training")}</p>
-          </div>
+        
+        <div className="chart-container">
+          <h3>Розподіл ваших балів</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={getScoreDistribution(selectedStudent)}
+                cx="50%"
+                cy="50%"
+                labelLine={true}
+                label={({ name, percent }) => percent > 0 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''}
+                outerRadius={100}
+                fill="#8884d8"
+                dataKey="count"
+                nameKey="range"
+              >
+                {getScoreDistribution(selectedStudent).map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value, name, props) => [value > 0 ? value : 0, 'Кількість тестів']} />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-      )}
+        
+        <div className="chart-container">
+          <h3>Порівняння з класом</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart
+              data={getComparisonData(selectedStudent)}
+              margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+              <YAxis domain={[0, 200]} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="Ваш бал" fill="#3498db" />
+              <Bar dataKey="Середній бал класу" fill="#2ecc71" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+      
+      <div className="analytics-recommendations">
+        <h3>Рекомендації для покращення</h3>
+        <div className="recommendations-content">
+          {getStudentTrend(selectedStudent) === "up" && (
+            <p>Ваші результати демонструють позитивну динаміку. Продовжуйте в тому ж темпі та зосередьтеся на підтримці високого рівня.</p>
+          )}
+          {getStudentTrend(selectedStudent) === "down" && (
+            <p>Ваші результати демонструють тенденцію до зниження. Рекомендуємо переглянути стратегію підготовки та приділити більше уваги проблемним темам.</p>
+          )}
+          {getStudentTrend(selectedStudent) === "neutral" && (
+            <p>Ваші результати стабільні. Для підвищення ефективності рекомендуємо урізноманітнити підхід до вивчення матеріалу.</p>
+          )}
+          <p>Для досягнення кращих результатів:</p>
+          <ul>
+            <li>Регулярно практикуйтеся, розв'язуючи тренувальні тести</li>
+            <li>Аналізуйте свої помилки та працюйте над їх виправленням</li>
+            <li>Зосередьтеся на темах, які викликають найбільше труднощів</li>
+            <li>Встановіть чіткий графік підготовки та дотримуйтесь його</li>
+          </ul>
+        </div>
+      </div>
     </div>
-  );
+  )}
+  {/* Інформація про вибраного учня (для адміна) */}
+  {selectedStudent && userRole !== 'student' && (
+    <div className="student-details">
+      <h2>{students.find(s => s.id === selectedStudent)?.name}</h2>
+      <div className="student-stats">
+        <p>Середній бал (вхідні): {getStudentAverage(selectedStudent, "own")}</p>
+        <p>Середній бал (тренувальні): {getStudentAverage(selectedStudent, "training")}</p>
+        <p>Рейтинг (вхідні): {getStudentRank(selectedStudent, "own")}</p>
+        <p>Тенденція: 
+          <span className={`trend-value ${getStudentTrend(selectedStudent)}`}>
+            {getStudentTrend(selectedStudent) === "up" && " Зростання ↑"}
+            {getStudentTrend(selectedStudent) === "down" && " Спадання ↓"}
+            {getStudentTrend(selectedStudent) === "neutral" && " Стабільно →"}
+          </span>
+        </p>
+      </div>
+      
+      {/* Дані про прогрес обраного учня */}
+      <div className="student-progress-chart">
+        <h3>Прогрес учня</h3>
+        <ResponsiveContainer width="100%" height={250}>
+          <LineChart 
+            data={getStudentProgress(selectedStudent)}
+            margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" angle={-45} textAnchor="end" height={70} />
+            <YAxis domain={[0, 200]} />
+            <Tooltip formatter={(value) => [`${value}`, 'Бал']} />
+            <Line 
+              type="monotone" 
+              dataKey="score" 
+              stroke="#3498db" 
+              activeDot={{ r: 8 }} 
+              name="Бал" 
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  )}
+</div>
+);
 };
 
 export default StudentDashboard;
