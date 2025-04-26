@@ -100,7 +100,8 @@ const LoginPage = ({ onLogin }) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="email" // Змінено
+              autoComplete="email"
+              placeholder="Введіть ваш email"
             />
           </div>
           
@@ -112,7 +113,8 @@ const LoginPage = ({ onLogin }) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              autoComplete="current-password" // Змінено
+              autoComplete="current-password"
+              placeholder="Введіть ваш пароль"
             />
           </div>
           
@@ -126,9 +128,7 @@ const LoginPage = ({ onLogin }) => {
         </form>
         
         <div className="login-info">
-          <p>Для доступу використовуйте надані облікові дані:</p>
-          <p>Email: ваш.email@приклад.com</p>
-          <p>Пароль: ************</p>
+          <p align="center">Для входу в персональний кабінет використовуйте надані Романом Васильовичем дані.</p>
         </div>
       </div>
     </div>

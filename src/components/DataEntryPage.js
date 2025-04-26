@@ -241,7 +241,6 @@ const saveResults = async () => {
     <div className="data-entry-container">
       <header className="data-entry-header">
         <h1>Введення результатів НМТ з математики</h1>
-        <button className="logout-btn" onClick={onLogout}>Вийти</button>
       </header>
 
       <div className="data-entry-controls">

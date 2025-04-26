@@ -1,0 +1,634 @@
+/* Mobile fixes CSS - фінальна версія */
+
+/* ===== БАЗОВІ СТИЛІ НАВІГАЦІЙНОЇ ПАНЕЛІ ===== */
+.dashboard-navbar {
+    background-color: #2c3e50;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-direction: row; /* Явне визначення напрямку для десктопу */
+    flex-wrap: nowrap;   /* Без перенесення на новий рядок */
+  }
+  
+  .dashboard-navbar button {
+    padding: 8px 16px;
+    background-color: transparent;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: auto; /* Автоматична ширина на десктопі */
+  }
+  
+  .dashboard-navbar button i {
+    font-size: 16px;
+  }
+  
+  .dashboard-navbar button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .dashboard-navbar button.active {
+    background-color: #3498db;
+  }
+  
+  .dashboard-navbar .user-role {
+    color: white;
+    font-weight: bold;
+    padding: 8px 12px;
+    margin-right: 15px;
+    background-color: #34495e;
+    border-radius: 4px;
+    display: inline-block;
+    width: auto; /* Нефіксована ширина на десктопі */
+  }
+  
+  .dashboard-navbar .logout-btn {
+    margin-left: auto;
+    background-color: #e74c3c;
+  }
+  
+  .dashboard-navbar .logout-btn:hover {
+    background-color: #c0392b;
+  }
+  
+  /* Групування кнопок для десктопу не потрібне, але буде використовуватись для мобільних */
+  .navbar-buttons-container {
+    display: contents; /* Розподіляє дочірні елементи у батьківський контейнер */
+  }
+  
+  /* ===== СТИЛІ ДЛЯ ТАБЛИЦЬ І КОНТЕЙНЕРІВ ===== */
+  .results-table-container,
+  .student-scores-container,
+  .conversion-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  
+  .results-table,
+  .student-scores-table {
+    min-width: 100%;
+    border-collapse: collapse;
+  }
+  
+  /* Підказка для горизонтального скролу */
+  .results-table-container::after,
+  .student-scores-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 5px;
+    background: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.1));
+    pointer-events: none;
+    opacity: 0;
+  }
+  
+  /* ===== СТИЛІ ДЛЯ ФОРМ І КАРТОК ===== */
+  .input-group input,
+  .input-group select,
+  select,
+  input[type="number"],
+  input[type="text"],
+  input[type="password"],
+  input[type="email"] {
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+  
+  .overview-card,
+  .chart-container,
+  .student-details,
+  .analytics-recommendations,
+  .student-scores-container,
+  .login-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* ===== СТУДЕНТСЬКИЙ ПРОФІЛЬ ===== */
+  .results-table .student-name-cell {
+    width: 30%;
+  }
+  
+  .results-table th, 
+  .results-table td {
+    padding: 8px 4px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+  .category-selector {
+    display: flex;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .category-selector button {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  
+  .analytics-toggle-btn {
+    position: relative;
+    right: 0;
+    margin-bottom: 10px;
+    float: right;
+  }
+  
+  .stat-item {
+    min-height: 80px;
+  }
+  
+  /* ===== ФОРМА ЛОГУВАННЯ ===== */
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    padding: 15px;
+  }
+  
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .login-header {
+    padding: 20px;
+    background-color: #3498db;
+    color: white;
+    text-align: center;
+  }
+  
+  .login-header h1 {
+    margin: 10px 0 0;
+    font-size: 24px;
+    font-weight: 500;
+  }
+  
+  .login-logo {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .login-form {
+    padding: 20px;
+  }
+  
+  .input-group {
+    margin-bottom: 15px;
+  }
+  
+  .input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 14px;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+  }
+  
+  .input-group input:focus {
+    border-color: #3498db;
+    outline: none;
+  }
+  
+  .login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .login-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .login-info {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+    font-size: 14px;
+    color: #777;
+  }
+  
+  .login-info p {
+    margin: 5px 0;
+  }
+  
+  .error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    text-align: center;
+  }
+  
+  /* ===== АДАПТИВНІ СТИЛІ - ПЛАНШЕТИ (max-width: 768px) ===== */
+  @media (max-width: 768px) {
+    /* Навігаційна панель */
+    .dashboard-navbar {
+      padding: 8px 10px;
+      gap: 5px;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .dashboard-navbar .user-role {
+      width: 100%;
+      margin: 0 0 8px 0;
+      text-align: center;
+      display: block;
+    }
+    
+    /* Заміна контейнера для мобільних */
+    .navbar-buttons-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+      flex-wrap: nowrap;
+    }
+    
+    .dashboard-navbar button {
+      padding: 10px;
+      flex-grow: 0;
+      flex-basis: auto;
+    }
+    
+    .dashboard-navbar button .button-text {
+      display: none; /* Показуємо тільки іконки */
+    }
+    
+    .dashboard-navbar button i {
+      font-size: 18px;
+      margin: 0;
+    }
+    
+    /* Кнопка виходу в тому ж рядку */
+    .dashboard-navbar .logout-btn {
+      width: auto;
+      margin-left: 0;
+      margin-top: 0;
+      order: 4;
+    }
+    
+    /* Таблиці */
+    .results-table th, 
+    .results-table td,
+    .student-scores-table th,
+    .student-scores-table td {
+      padding: 8px 6px;
+    }
+    
+    .student-name-cell {
+      min-width: 140px;
+    }
+    
+    .test-result-cell {
+      min-width: 50px;
+    }
+    
+    .raw-score {
+      font-size: 14px;
+    }
+    
+    .converted-score {
+      font-size: 11px;
+    }
+    
+    /* Графіки і аналітика */
+    .analytics-overview,
+    .analytics-charts {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+    
+    .chart-container {
+      margin-bottom: 15px;
+      padding: 10px;
+    }
+    
+    .chart-container h3 {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+    
+    .recharts-responsive-container {
+      font-size: 12px !important;
+    }
+    
+    .recharts-text {
+      font-size: 10px !important;
+    }
+    
+    /* Форми */
+    .login-card {
+      width: 90%;
+      max-width: 400px;
+    }
+    
+    .login-form {
+      padding: 15px;
+    }
+    
+    .input-group {
+      margin-bottom: 12px;
+    }
+    
+    .add-result-modal .add-result-content {
+      width: 90%;
+      max-width: 400px;
+      padding: 15px;
+    }
+    
+    /* Картки статистики */
+    .stats-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .stat-item {
+      padding: 8px;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+    }
+    
+    .overview-card h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+  }
+  
+  /* ===== АДАПТИВНІ СТИЛІ - СМАРТФОНИ (max-width: 480px) ===== */
+  @media (max-width: 480px) {
+    /* Навігаційна панель на малих екранах */
+    .navbar-buttons-container {
+      flex-wrap: wrap;
+    }
+    
+    .dashboard-navbar button {
+      flex: 1 0 40%;
+      margin-bottom: 5px;
+    }
+    
+    .dashboard-navbar .logout-btn {
+      padding: 10px;
+      width: 100%;
+      order: 10;
+      margin-top: 5px;
+    }
+    
+    /* Таблиці */
+    .results-table,
+    .student-scores-table {
+      font-size: 12px;
+      min-width: 600px; /* Базова ширина для таблиці з горизонтальним скролом */
+    }
+    
+    .results-table th, 
+    .results-table td,
+    .student-scores-table th,
+    .student-scores-table td {
+      padding: 6px 4px;
+    }
+    
+    .student-name-cell {
+      min-width: 100px;
+    }
+    
+    .test-result-cell {
+      min-width: 40px;
+    }
+    
+    /* Аналітика і графіки */
+    .analytics-container {
+      padding: 10px;
+    }
+    
+    .analytics-header {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    
+    .analytics-header h1 {
+      font-size: 20px;
+    }
+    
+    .category-selector {
+      width: 100%;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .chart-container {
+      height: auto !important;
+      padding: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .chart-container h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    
+    .chart-type-selector {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .chart-type-selector button {
+      font-size: 11px;
+      padding: 5px 8px;
+      margin-bottom: 5px;
+    }
+    
+    .recharts-wrapper,
+    .recharts-responsive-container {
+      height: 250px !important; /* Змінено висоту для кращого відображення */
+      font-size: 10px !important;
+    }
+    
+    .chart-controls {
+      margin-bottom: 10px;
+    }
+    
+    .chart-controls select,
+    .chart-controls input {
+      padding: 6px;
+      font-size: 12px;
+      width: 100%;
+    }
+    
+    .analytics-recommendations {
+      padding: 10px;
+    }
+    
+    .analytics-recommendations h3 {
+      font-size: 14px;
+    }
+    
+    .recommendations-content p,
+    .recommendations-content li {
+      font-size: 12px;
+    }
+    
+    /* Форми і елементи інтерфейсу */
+    .student-scores-table input {
+      width: 40px;
+      padding: 4px;
+      font-size: 12px;
+    }
+    
+    .login-card {
+      width: 95%;
+    }
+    
+    .login-header h1 {
+      font-size: 20px;
+    }
+    
+    .login-form {
+      padding: 12px;
+    }
+    
+    .login-logo {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .login-button {
+      padding: 10px;
+    }
+    
+    .login-info {
+      padding: 10px;
+      font-size: 12px;
+    }
+    
+    /* Модальне вікно */
+    .add-result-content {
+      width: 95%;
+      padding: 12px;
+    }
+    
+    .add-result-content h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    
+    .add-result-content select,
+    .add-result-content input {
+      font-size: 14px;
+      padding: 8px;
+      margin: 8px 0;
+    }
+    
+    .add-result-buttons button {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    
+    /* Студентська аналітика */
+    .student-analytics {
+      padding: 12px;
+    }
+    
+    .student-analytics h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    
+    .student-analytics .analytics-overview,
+    .student-analytics .analytics-charts {
+      grid-template-columns: 1fr;
+    }
+    
+    .trend-info {
+      gap: 8px;
+    }
+    
+    .trend-label {
+      font-size: 14px;
+    }
+    
+    .trend-value {
+      font-size: 16px;
+    }
+  }
+  
+  /* ===== ДУЖЕ МАЛІ ЕКРАНИ (max-width: 320px) ===== */
+  @media (max-width: 320px) {
+    .dashboard-navbar button {
+      padding: 8px;
+    }
+    
+    .dashboard-navbar button i {
+      font-size: 16px;
+    }
+    
+    /* Для дуже малих екранів кнопки в стовпчик */
+    .navbar-buttons-container {
+      flex-direction: column;
+    }
+    
+    .dashboard-navbar button {
+      width: 100%;
+      margin-bottom: 4px;
+    }
+  }
+  
+  /* ===== iOS СПЕЦИФІЧНІ СТИЛІ ===== */
+  @supports (-webkit-touch-callout: none) {
+    /* Запобігання зумінгу форм на iOS */
+    input, select, textarea, button {
+      font-size: 16px !important;
+    }
+    
+    /* Запобігання перекриття кнопок на iOS */
+    .dashboard-navbar button {
+      margin-right: 2px;
+    }
+  }

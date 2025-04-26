@@ -4,6 +4,7 @@ import LoginPage from './components/LoginPage';
 import DataEntryPage from './components/DataEntryPage';
 import StudentDashboard from './components/StudentDashboard';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
+import './mobile-fixes.css';
 import { supabase } from './supabase';
 
 function App() {
@@ -96,9 +97,12 @@ function App() {
         <div className="dashboard-wrapper">
           <div className="dashboard-navbar">
             <span className="user-role">Учень</span>
-            <button className="logout-btn" onClick={handleLogout}>
-              Вийти
-            </button>
+            <div className="navbar-buttons-container">
+              <button className="logout-btn" onClick={handleLogout}>
+                <i className="fas fa-sign-out-alt"></i>
+                <span className="button-text">Вийти</span>
+              </button>
+            </div>
           </div>
           <StudentDashboard studentId={auth.studentId} userRole={auth.role} />
         </div>
@@ -107,97 +111,49 @@ function App() {
 
     // Для всіх адміністративних ролей (вчитель/аналітик/адмін) показуємо однаковий інтерфейс
     // з доступом до всіх функцій (об'єднуємо ролі)
-    if (view === 'dataEntry') {
-      return (
-        <div className="dashboard-wrapper">
-          <div className="dashboard-navbar">
-            <span className="user-role">Адміністратор</span>
+    return (
+      <div className="dashboard-wrapper">
+        <div className="dashboard-navbar">
+          <span className="user-role">Адміністратор</span>
+          
+          <div className="navbar-buttons-container">
             <button 
               className={view === 'dashboard' ? 'active' : ''}
               onClick={() => setView('dashboard')}
             >
-              Моніторинг
+              <i className="fas fa-chart-line"></i>
+              <span className="button-text">Моніторинг</span>
             </button>
+            
             <button 
               className={view === 'analytics' ? 'active' : ''}
               onClick={() => setView('analytics')}
             >
-              Аналітика
+              <i className="fas fa-chart-pie"></i>
+              <span className="button-text">Аналітика</span>
             </button>
+            
             <button 
               className={view === 'dataEntry' ? 'active' : ''}
               onClick={() => setView('dataEntry')}
             >
-              Ввід даних
+              <i className="fas fa-edit"></i>
+              <span className="button-text">Ввід даних</span>
             </button>
+            
             <button className="logout-btn" onClick={handleLogout}>
-              Вийти
+              <i className="fas fa-sign-out-alt"></i>
+              <span className="button-text">Вийти</span>
             </button>
           </div>
-          <DataEntryPage onLogout={handleLogout} userRole="admin" />
         </div>
-      );
-    } else if (view === 'analytics') {
-      return (
-        <div className="dashboard-wrapper">
-          <div className="dashboard-navbar">
-            <span className="user-role">Адміністратор</span>
-            <button 
-              className={view === 'dashboard' ? 'active' : ''}
-              onClick={() => setView('dashboard')}
-            >
-              Моніторинг
-            </button>
-            <button 
-              className={view === 'analytics' ? 'active' : ''}
-              onClick={() => setView('analytics')}
-            >
-              Аналітика
-            </button>
-            <button 
-              className={view === 'dataEntry' ? 'active' : ''}
-              onClick={() => setView('dataEntry')}
-            >
-              Ввід даних
-            </button>
-            <button className="logout-btn" onClick={handleLogout}>
-              Вийти
-            </button>
-          </div>
-          <AnalyticsDashboard userRole="admin" />
-        </div>
-      );
-    } else {
-      return (
-        <div className="dashboard-wrapper">
-          <div className="dashboard-navbar">
-            <span className="user-role">Адміністратор</span>
-            <button 
-              className={view === 'dashboard' ? 'active' : ''}
-              onClick={() => setView('dashboard')}
-            >
-              Моніторинг
-            </button>
-            <button 
-              className={view === 'analytics' ? 'active' : ''}
-              onClick={() => setView('analytics')}
-            >
-              Аналітика
-            </button>
-            <button 
-              className={view === 'dataEntry' ? 'active' : ''}
-              onClick={() => setView('dataEntry')}
-            >
-              Ввід даних
-            </button>
-            <button className="logout-btn" onClick={handleLogout}>
-              Вийти
-            </button>
-          </div>
-          <StudentDashboard userRole="admin" />
-        </div>
-      );
-    }
+        
+        {/* Відображаємо відповідний компонент в залежності від обраного виду */}
+        {view === 'dashboard' && <StudentDashboard userRole="admin" />}
+        {view === 'analytics' && <AnalyticsDashboard userRole="admin" />}
+        {view === 'dataEntry' && <DataEntryPage onLogout={handleLogout} userRole="admin" />}
+      </div>
+    );
   };
 
   return (
