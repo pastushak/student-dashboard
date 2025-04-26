@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/student-dashboard/static/css/main.e5193eaf.css",
-    "main.js": "/student-dashboard/static/js/main.cdb3378c.js",
+    "main.css": "/student-dashboard/static/css/main.b4915e20.css",
+    "main.js": "/student-dashboard/static/js/main.2d17be7e.js",
     "static/js/952.82f1f273.chunk.js": "/student-dashboard/static/js/952.82f1f273.chunk.js",
     "static/js/453.e5836497.chunk.js": "/student-dashboard/static/js/453.e5836497.chunk.js",
     "static/media/logo.svg": "/student-dashboard/static/media/logo.8c3b984adaebfcffba3c1a59ca5cd86e.svg",
     "index.html": "/student-dashboard/index.html",
-    "main.e5193eaf.css.map": "/student-dashboard/static/css/main.e5193eaf.css.map",
-    "main.cdb3378c.js.map": "/student-dashboard/static/js/main.cdb3378c.js.map",
+    "main.b4915e20.css.map": "/student-dashboard/static/css/main.b4915e20.css.map",
+    "main.2d17be7e.js.map": "/student-dashboard/static/js/main.2d17be7e.js.map",
     "952.82f1f273.chunk.js.map": "/student-dashboard/static/js/952.82f1f273.chunk.js.map",
     "453.e5836497.chunk.js.map": "/student-dashboard/static/js/453.e5836497.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e5193eaf.css",
-    "static/js/main.cdb3378c.js"
+    "static/css/main.b4915e20.css",
+    "static/js/main.2d17be7e.js"
   ]
 }
