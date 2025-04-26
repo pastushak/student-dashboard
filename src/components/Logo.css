@@ -1,0 +1,35 @@
+/* Logo.css */
+.logo-container {
+    position: relative;
+  }
+  
+  .logo {
+    display: none;
+  }
+  
+  /* Для десктопів */
+  @media (min-width: 769px) {
+    .logo-desktop {
+      display: block;
+      width: 80px;
+      height: 80px;
+    }
+  }
+  
+  /* Для планшетів */
+  @media (min-width: 481px) and (max-width: 768px) {
+    .logo-tablet {
+      display: block;
+      width: 60px;
+      height: 60px;
+    }
+  }
+  
+  /* Для мобільних пристроїв */
+  @media (max-width: 480px) {
+    .logo-mobile {
+      display: block;
+      width: 40px;
+      height: 40px;
+    }
+  }

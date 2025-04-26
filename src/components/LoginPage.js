@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './LoginPage.css';
-import logo from '../logo.svg';
+import Logo from './Logo'; // Імпортуйте новий компонент
 import { supabase } from '../supabase';
 
 const LoginPage = ({ onLogin }) => {
@@ -85,7 +85,7 @@ const LoginPage = ({ onLogin }) => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <img src={logo} alt="Логотип" className="login-logo" />
+          <Logo /> {/* Використовуйте компонент замість <img src={logo} /> */}
           <h1>Моніторинг НМТ з математики</h1>
         </div>
         
