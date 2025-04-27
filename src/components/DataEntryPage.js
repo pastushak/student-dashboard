@@ -316,7 +316,7 @@ const saveResults = async () => {
 
       {selectedTest ? (
         <div className="student-scores-container">
-          <h2>{selectedCategory === "own" ? "Варіант " : "Тренувальний тест "} 
+          <h2>{selectedCategory === "own" ? "" : "Тренувальний тест "} 
             {tests.find(t => t.id === selectedTest)?.name}</h2>
           
           <table className="student-scores-table">

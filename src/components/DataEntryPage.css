@@ -1,15 +1,20 @@
 /* DataEntryPage.css */
+/* Базові стилі контейнера */
 .data-entry-container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
   font-family: 'Roboto', sans-serif;
+  box-sizing: border-box;
 }
 
+/* Стилі заголовка */
 .data-entry-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  text-align: center;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px solid #3498db;
@@ -17,10 +22,11 @@
 
 .data-entry-header h1 {
   color: #2c3e50;
-  margin: 0;
   font-size: 24px;
+  margin: 10px 0;
 }
 
+/* Кнопка виходу */
 .logout-btn {
   padding: 8px 16px;
   background-color: #e74c3c;
@@ -35,6 +41,7 @@
   background-color: #c0392b;
 }
 
+/* Контроли сторінки */
 .data-entry-controls {
   display: flex;
   flex-wrap: wrap;
@@ -84,6 +91,7 @@
   background-color: #8e44ad;
 }
 
+/* Контейнер таблиці конвертації */
 .conversion-table-container {
   background-color: #f8f9fa;
   padding: 15px;
@@ -122,11 +130,16 @@
   top: 0;
 }
 
+/* Контейнер оцінок студентів */
 .student-scores-container {
   background-color: white;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 20px;
+  width: 100%;
 }
 
 .student-scores-container h2 {
@@ -136,37 +149,69 @@
   color: #2c3e50;
   font-size: 18px;
   border-bottom: 1px solid #ddd;
+  text-align: center;
 }
 
+/* Таблиця оцінок */
 .student-scores-table {
   width: 100%;
+  min-width: 280px;
   border-collapse: collapse;
 }
 
-.student-scores-table th, .student-scores-table td {
+.student-scores-table th,
+.student-scores-table td {
   padding: 12px;
-  text-align: left;
   border-bottom: 1px solid #ddd;
+  text-align: center;
 }
 
 .student-scores-table th {
   background-color: #f9f9f9;
   font-weight: bold;
+  line-height: 1.4;
+  vertical-align: middle;
+  padding-bottom: 8px;
+  padding-top: 8px;
 }
 
+/* Встановлення співвідношення ширини стовпців */
+.student-scores-table th:first-child,
+.student-scores-table td:first-child {
+  width: 40%;
+  text-align: left;
+}
+
+.student-scores-table th:nth-child(2),
 .student-scores-table td:nth-child(2),
+.student-scores-table th:nth-child(3),
 .student-scores-table td:nth-child(3) {
-  text-align: center;
+  width: 30%;
 }
 
+/* Поля введення */
 .student-scores-table input {
   width: 60px;
   padding: 6px;
   text-align: center;
   border: 1px solid #ddd;
   border-radius: 4px;
+  margin: 0 auto;
+  display: block;
 }
 
+.student-scores-table input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+}
+
+/* Ефекти ховера */
+.student-scores-table tbody tr:hover {
+  background-color: #f5f8fa;
+}
+
+/* Стан, коли тест не вибрано */
 .no-test-selected {
   display: flex;
   justify-content: center;
@@ -178,7 +223,147 @@
   font-style: italic;
 }
 
+/* Індикатор завантаження */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Повідомлення про статус збереження */
+.save-status {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  animation: fadeIn 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.save-status.success {
+  background-color: #2ecc71;
+}
+
+.save-status.error {
+  background-color: #e74c3c;
+}
+
+/* Кнопка збереження результатів */
+.save-results-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.save-results-btn {
+  padding: 12px 24px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 250px;
+}
+
+.save-results-btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+}
+
+.save-results-btn:active {
+  transform: translateY(1px);
+}
+
+.save-results-btn:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.save-results-btn.unsaved {
+  background-color: #e74c3c;
+  animation: pulse 1.5s infinite;
+}
+
+.unsaved-message {
+  margin-top: 10px;
+  color: #e74c3c;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Анімації */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Адаптивні стилі */
+@media (min-width: 1200px) {
+  .data-entry-container {
+    width: 65%;
+  }
+  
+  .student-scores-table {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 769px) {
+  .student-scores-table {
+    table-layout: fixed;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .student-scores-table th,
+  .student-scores-table td {
+    padding: 12px 15px;
+  }
+  
+  .student-scores-table input {
+    width: 70px;
+  }
+}
+
 @media (max-width: 768px) {
+  .data-entry-container {
+    padding: 10px;
+  }
+  
   .data-entry-controls {
     flex-direction: column;
     align-items: stretch;
@@ -191,182 +376,73 @@
   .student-scores-table {
     font-size: 14px;
   }
+}
+
+@media (max-width: 480px) {
+  .data-entry-header h1 {
+    font-size: 18px;
+  }
+  
+  .data-entry-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .category-selector {
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .category-selector button {
+    flex: 1;
+    font-size: 14px;
+  }
+  
+  .test-selector select {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .conversion-table-btn {
+    width: 100%;
+    margin-left: 0;
+  }
+  
+  /* Оптимізація таблиці для мобільних */
+  .student-scores-table th,
+  .student-scores-table td {
+    padding: 4px 2px;
+    font-size: 13px;
+  }
   
   .student-scores-table input {
-    width: 50px;
+    width: 40px;
+    padding: 2px 4px;
+    font-size: 13px;
+  }
+  
+  .student-scores-table th {
+    line-height: 1.2;
+  }
+  
+  .student-scores-table tr {
+    line-height: 1.3;
+  }
+  
+  .student-scores-container h2 {
+    font-size: 16px;
   }
 }
 
-/* Додамо стилі для індикатора завантаження */
-.loading-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 1.2rem;
-  color: #555;
-}
-
-/* Стилі для повідомлення про статус збереження */
-.save-status {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  border-radius: 4px;
-  color: white;
-  font-weight: bold;
-  animation: fadeIn 0.3s ease-in-out;
-  z-index: 1000;
-}
-
-.save-status.success {
-  background-color: #2ecc71;
-}
-
-.save-status.error {
-  background-color: #e74c3c;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+/* Дуже малі екрани */
+@media (max-width: 320px) {
+  .student-scores-table th,
+  .student-scores-table td {
+    padding: 3px 1px;
+    font-size: 12px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Покращимо стилі таблиці результатів */
-.student-scores-table input {
-  width: 60px;
-  padding: 6px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.student-scores-table input:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-}
-
-/* Додамо стилі для ховеру над рядками таблиці */
-.student-scores-table tbody tr:hover {
-  background-color: #f5f8fa;
-}
-
-/* Додамо стилі для індикатора завантаження */
-.loading-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  font-size: 1.2rem;
-  color: #555;
-}
-
-/* Стилі для повідомлення про статус збереження */
-.save-status {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  border-radius: 4px;
-  color: white;
-  font-weight: bold;
-  animation: fadeIn 0.3s ease-in-out;
-  z-index: 1000;
-}
-
-.save-status.success {
-  background-color: #2ecc71;
-}
-
-.save-status.error {
-  background-color: #e74c3c;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Покращимо стилі таблиці результатів */
-.student-scores-table input {
-  width: 60px;
-  padding: 6px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.student-scores-table input:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-}
-
-/* Додамо стилі для ховеру над рядками таблиці */
-.student-scores-table tbody tr:hover {
-  background-color: #f5f8fa;
-}
-
-/* Стилі для кнопки збереження результатів */
-.save-results-container {
-  margin-top: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.save-results-btn {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.save-results-btn:hover {
-  background-color: #2980b9;
-}
-
-.save-results-btn:disabled {
-  background-color: #95a5a6;
-  cursor: not-allowed;
-}
-
-.save-results-btn.unsaved {
-  background-color: #e74c3c;
-  animation: pulse 1.5s infinite;
-}
-
-.unsaved-message {
-  margin-left: 15px;
-  color: #e74c3c;
-  font-style: italic;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 1;
+  
+  .student-scores-table input {
+    width: 35px;
   }
 }

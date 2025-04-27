@@ -25,7 +25,10 @@
   padding: 20px;
   background-color: #3498db;
   color: white;
-  text-align: center;
+  text-align: center; /* Перевірте чи є ця властивість */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Центрує все вертикально складені елементи */
 }
 
 .login-header h1 {
@@ -37,6 +40,8 @@
 .login-logo {
   width: 80px;
   height: 80px;
+  margin: 0 auto; /* Це центрує логотип */
+  display: block; /* Важливо для правильного центрування */
 }
 
 /* Сама форма з полями вводу */
